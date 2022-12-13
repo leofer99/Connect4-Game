@@ -139,7 +139,7 @@ player Menu(player Enemy_player)
     if (Enemy_player.GetPlayerType() != "Human")
         while (true)
         {
-            cout << "How difficult you want the game to be?\n(1-Easy | 2-Medium | 3-Hard)" << endl;
+            cout << "How difficult you want the game to be?\n(1-Easy | 2-Medium | 3-Hard) ";
             cin >> GameMode;
 
             if (GameMode == AI_Easy)
