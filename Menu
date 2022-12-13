@@ -1,0 +1,182 @@
+// N_Linha.cpp : Este arquivo contém a função 'main'. A execução do programa começa e termina ali.
+//
+
+#include <iostream>
+#include <cmath>
+#include <iomanip>
+#include <cstddef>
+#include <vector>
+#include <string>
+#include <ctime>
+
+using namespace std;
+
+//---------------------------------------------------------------------------------------
+class player
+{
+public:
+    player(int player_number, string symbol, string player_type);
+    void InputName();
+    string GetName();
+    int GetNumber();
+    string GetSymbol();
+    string GetColour();
+    string GetPlayerType();
+    void SetPlayerType(string type);
+    //setDisc
+    //selectColumntoPlay()
+
+
+private:
+    int player_number; // 1 or 2
+    string name;
+    string symbol; // 'X' or 'O'
+    string colour; // 'red' or 'blue'
+    string player_type; // "Human", "Computer_Easy", "Computer_Medium", "Computer_Hard"
+    //int N_in_line
+
+};
+
+
+//--------------------------------------------------------------------------------------
+
+player::player(int player_num, string symbol, string player_type)
+{
+    this->player_number = player_num;
+    this->symbol = symbol;
+    this->player_type = player_type;
+    this->name = "";
+    
+    if (symbol == "X")
+        this->colour = "red";
+    else if (symbol == "O")
+        this->colour = "blue";
+
+}
+
+void player::InputName()
+{
+    if (this->player_type == "Human")
+    {
+        int ID = this->player_number;
+        cout << "\nPlayer" << ID << ", write your name: ";
+        cin >> this->name;
+        cout << "\nPlayer" << ID << ":" << this->name << endl;
+    }
+    
+    else
+    {
+        this->name = this->player_type;
+        cout << "\nPlayer" << this->player_number << ":" << this->name << endl;
+    }
+        
+    
+}
+
+int player::GetNumber()
+{
+    return this->player_number;
+}
+
+string player::GetColour()
+{
+    return this->colour;
+}
+
+string player::GetSymbol()
+{
+    return this->symbol;
+}
+
+string player::GetName()
+{
+    return this->name;
+}
+
+string player::GetPlayerType()
+{
+    return this->player_type;
+}
+
+void player::SetPlayerType(string type)
+{
+    this->player_type = type;
+}
+//-----------------------------------------------------------------------------------------------
+
+player Menu(player Enemy_player)
+{
+    string GameMode = "";
+    string PlayerVSPlayer = "1";
+    string PlayerVSComputer = "2";
+    string AI_Easy = "1";
+    string AI_Medium = "2";
+    string AI_Hard = "3";
+
+    while (true)
+    {
+        cout << "How many people are playing?\n(1-Player VS Computer | 2-Player VS Player): ";
+        cin >> GameMode;
+        cout << endl;
+
+        if (GameMode == PlayerVSPlayer)
+        {
+            Enemy_player.SetPlayerType("Computer_Easy");
+            break;
+        }
+
+        else if (GameMode == PlayerVSComputer)
+        {
+            Enemy_player.SetPlayerType("Human");
+            break;
+        }
+
+        else
+            cout << "Error! You must input 1 or 2." << endl;
+
+    }
+    
+    if (Enemy_player.GetPlayerType() != "Human")
+        while (true)
+        {
+            cout << "How difficult you want the game to be?\n(1-Easy | 2-Medium | 3-Hard)" << endl;
+            cin >> GameMode;
+
+            if (GameMode == AI_Easy)
+            {
+                Enemy_player.SetPlayerType("Computer_Easy");
+                break;
+            }
+
+            else if (GameMode == AI_Medium)
+            {
+                Enemy_player.SetPlayerType("Computer_Medium");
+                break;
+            }
+
+            else if (GameMode == AI_Hard)
+            {
+                Enemy_player.SetPlayerType("Computer_Hard");
+                break;
+            }
+
+            else
+                cout << "Error! You must input 1 , 2 or 3." << endl;
+
+        }
+
+    return Enemy_player;
+
+}
+
+//---------------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------------------------
+int main()
+{
+    player player1 = player(1, "X", "Human");
+    player player2 = player(2, "O", "Human");
+    player2 = Menu(player2);
+    player1.InputName();
+    player2.InputName();
+}
