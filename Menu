@@ -23,8 +23,9 @@ public:
     string GetColour();
     string GetPlayerType();
     void SetPlayerType(string type);
-    //setDisc
-    //selectColumntoPlay()
+    void SetDisc(string symbol, string colour);
+    char GetColumnSelected();
+    void selectColumntoPlay(string inputed_column);
 
 
 private:
@@ -33,6 +34,7 @@ private:
     string symbol; // 'X' or 'O'
     string colour; // 'red' or 'blue'
     string player_type; // "Human", "Computer_Easy", "Computer_Medium", "Computer_Hard"
+    char column_selected; // a letter between A-Z
     //int N_in_line
 
 };
@@ -46,7 +48,7 @@ player::player(int player_num, string symbol, string player_type)
     this->symbol = symbol;
     this->player_type = player_type;
     this->name = "";
-    
+
     if (symbol == "X")
         this->colour = "red";
     else if (symbol == "O")
@@ -63,14 +65,14 @@ void player::InputName()
         cin >> this->name;
         cout << "\nPlayer" << ID << ":" << this->name << endl;
     }
-    
+
     else
     {
         this->name = this->player_type;
         cout << "\nPlayer" << this->player_number << ":" << this->name << endl;
     }
-        
-    
+
+
 }
 //---------------------------------------------------------------------------------------
 int player::GetNumber()
@@ -101,6 +103,63 @@ string player::GetPlayerType()
 void player::SetPlayerType(string type)
 {
     this->player_type = type;
+}
+
+//-----------------------------------------------------------------------------------------------
+void player::SetDisc(string symbol, string colour)
+{
+    this->colour = colour;
+    this->symbol = symbol;
+}
+//----------------------------------------------------------------------------------------------
+
+char player::GetColumnSelected()
+{
+    return this->column_selected;
+}
+
+//-----------------------------------------------------------------------------------------------
+void player::selectColumntoPlay(string inputed_column)
+{
+
+    const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    string player_name = this->name;
+    int Not_found = -1;
+
+    if ( (this->player_type == "Human"))
+    {
+
+        while (true)
+        {
+            cout << "\n" << player_name << ", in which column, do you want to insert your piece?" << endl;
+            cin >> inputed_column;
+
+
+            if ((inputed_column.size() != 1) || (int(inputed_column[0]) > int('z')) ) // garante que o input é somente uma letra
+                inputed_column = "_";
+
+
+            if (int(inputed_column[0]) > int('Z')) // garante que as minusculas sejam convertidas em maiúsculas
+                inputed_column[0] = char(int(inputed_column[0]) - 32); 
+
+
+            if (int(alphabet.find(inputed_column[0])) == Not_found) // garante que o inputed_column averiguado encontra-se no alfabeto
+                cout << "\nError! You must insert a valid input." << endl;
+            else
+            {
+                this->column_selected = inputed_column[0];
+                break;
+
+            }
+               
+
+        }
+        
+
+
+    }
+
+
 }
 //-----------------------------------------------------------------------------------------------
 
@@ -135,7 +194,7 @@ player Menu(player Enemy_player)
             cout << "Error! You must input 1 or 2." << endl;
 
     }
-    
+
     if (Enemy_player.GetPlayerType() != "Human")
         while (true)
         {
@@ -161,7 +220,7 @@ player Menu(player Enemy_player)
             }
 
             else
-                cout << "Error! You must input 1 , 2 or 3." << endl;
+                cout << "\nError! You must input 1 , 2 or 3." << endl;
 
         }
 
@@ -177,4 +236,13 @@ int main()
     player2 = Menu(player2);
     player1.InputName();
     player2.InputName();
+    player1.selectColumntoPlay("");
+    player2.selectColumntoPlay("");
+    
+    //Temporário---
+    cout << "\nColumn selected by player1: " << player1.GetColumnSelected();
+    if (player2.GetPlayerType() == "Human")
+        cout << "\nColumn selected by player2: " << player2.GetColumnSelected();
+    //-------------
+    
 }
