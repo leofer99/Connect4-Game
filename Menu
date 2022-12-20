@@ -205,7 +205,7 @@ player Menu(player Enemy_player)
         {
             cout << "Error! You must input 1 or 2." << endl;
         }
-            
+
 
     }
 
@@ -255,7 +255,7 @@ int main()
 
     //Temporário---
     cout << "\nColumn selected by player1: " << player1.GetColumnSelected() << " - " << player1.GetColumnSelectedChar();
-    cout << "\nColumn selected by player2: " << player2.GetColumnSelected() << " - " << player2.GetColumnSelectedChar(); // Irá devoler 8 - I, caso seja "Human", pois coloquei no argumento do player2.selectColumntoPlay(8), o int 8 que corresponde a I.
+    cout << "\nColumn selected by player2: " << player2.GetColumnSelected() << " - " << player2.GetColumnSelectedChar(); // Irá devoler 8 - I, caso NÃO seja "Human", pois coloquei no argumento do player2.selectColumntoPlay(8), o int 8 que corresponde a I.
     //-------------
 
 }
