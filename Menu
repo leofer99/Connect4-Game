@@ -24,8 +24,9 @@ public:
     string GetPlayerType();
     void SetPlayerType(string type);
     void SetDisc(string symbol, string colour);
-    char GetColumnSelected();
-    void selectColumntoPlay(string inputed_column);
+    int GetColumnSelected();
+    char GetColumnSelectedChar();
+    void selectColumntoPlay(int selected_column); // 0-A 1-B 2-C ...
 
 
 private:
@@ -34,7 +35,7 @@ private:
     string symbol; // 'X' or 'O'
     string colour; // 'red' or 'blue'
     string player_type; // "Human", "Computer_Easy", "Computer_Medium", "Computer_Hard"
-    char column_selected; // a letter between A-Z
+    int column_selected; // a column betwween A-Z, where 0=A, 1=B, 2=C, ...
     //int N_in_line
 
 };
@@ -113,20 +114,28 @@ void player::SetDisc(string symbol, string colour)
 }
 //----------------------------------------------------------------------------------------------
 
-char player::GetColumnSelected()
+int player::GetColumnSelected()
 {
     return this->column_selected;
 }
 
-//-----------------------------------------------------------------------------------------------
-void player::selectColumntoPlay(string inputed_column)
-{
+//----------------------------------------------------------------------------------------------
 
+char player::GetColumnSelectedChar()
+{
+    const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    return alphabet[this->column_selected];
+}
+
+//-----------------------------------------------------------------------------------------------
+void player::selectColumntoPlay(int selected_column)
+{
+    string inputed_column = "";
     const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     string player_name = this->name;
     int Not_found = -1;
 
-    if ( (this->player_type == "Human"))
+    if ((this->player_type == "Human"))
     {
 
         while (true)
@@ -135,29 +144,31 @@ void player::selectColumntoPlay(string inputed_column)
             cin >> inputed_column;
 
 
-            if ((inputed_column.size() != 1) || (int(inputed_column[0]) > int('z')) ) // garante que o input é somente uma letra
+            if ((inputed_column.size() != 1) || (int(inputed_column[0]) > int('z'))) // garante que o input é somente uma letra
                 inputed_column = "_";
 
 
             if (int(inputed_column[0]) > int('Z')) // garante que as minusculas sejam convertidas em maiúsculas
-                inputed_column[0] = char(int(inputed_column[0]) - 32); 
+                inputed_column[0] = char(int(inputed_column[0]) - 32);
 
 
             if (int(alphabet.find(inputed_column[0])) == Not_found) // garante que o inputed_column averiguado encontra-se no alfabeto
                 cout << "\nError! You must insert a valid input." << endl;
             else
             {
-                this->column_selected = inputed_column[0];
+                this->column_selected = int(alphabet.find(inputed_column[0]));
                 break;
 
             }
-               
+
 
         }
-        
+
 
 
     }
+    else
+        this->column_selected = selected_column;
 
 
 }
@@ -191,7 +202,10 @@ player Menu(player Enemy_player)
         }
 
         else
+        {
             cout << "Error! You must input 1 or 2." << endl;
+        }
+            
 
     }
 
@@ -236,13 +250,12 @@ int main()
     player2 = Menu(player2);
     player1.InputName();
     player2.InputName();
-    player1.selectColumntoPlay("");
-    player2.selectColumntoPlay("");
-    
+    player1.selectColumntoPlay(0);
+    player2.selectColumntoPlay(8);
+
     //Temporário---
-    cout << "\nColumn selected by player1: " << player1.GetColumnSelected();
-    if (player2.GetPlayerType() == "Human")
-        cout << "\nColumn selected by player2: " << player2.GetColumnSelected();
+    cout << "\nColumn selected by player1: " << player1.GetColumnSelected() << " - " << player1.GetColumnSelectedChar();
+    cout << "\nColumn selected by player2: " << player2.GetColumnSelected() << " - " << player2.GetColumnSelectedChar(); // Irá devoler 8 - I, caso seja "Human", pois coloquei no argumento do player2.selectColumntoPlay(8), o int 8 que corresponde a I.
     //-------------
-    
+
 }
