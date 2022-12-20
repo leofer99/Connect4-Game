@@ -177,8 +177,8 @@ void player::selectColumntoPlay(int selected_column)
 player Menu(player Enemy_player)
 {
     string GameMode = "";
-    string PlayerVSPlayer = "1";
-    string PlayerVSComputer = "2";
+    string PlayerVSComputer = "1";
+    string PlayerVSPlayer = "2";
     string AI_Easy = "1";
     string AI_Medium = "2";
     string AI_Hard = "3";
@@ -189,13 +189,13 @@ player Menu(player Enemy_player)
         cin >> GameMode;
         cout << endl;
 
-        if (GameMode == PlayerVSPlayer)
+        if (GameMode == PlayerVSComputer)
         {
             Enemy_player.SetPlayerType("Computer_Easy");
             break;
         }
 
-        else if (GameMode == PlayerVSComputer)
+        else if (GameMode == PlayerVSPlayer)
         {
             Enemy_player.SetPlayerType("Human");
             break;
