@@ -1,0 +1,102 @@
+
+#include <iostream>
+#include <cmath>
+#include <iomanip>
+#include <cstddef>
+#include <vector>
+#include <string>
+#include <ctime>
+
+using namespace std;
+
+string const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+
+//---------------------------------------------------------------------------------------
+
+class Board
+{
+    public:
+        Board(int Width, int Length, char board[Length][Width]);
+        void setWidth(int Width);
+        int getWidth(int Width, int NewWidth) const;
+        void CreateNewBoard(int NewWidth, char board[][NewWidth]);
+        string DrawBoard(int NewWidth, char board[][NewWidth]);
+        void insertPiece();
+
+
+
+    private:
+};
+
+//---------------------------------------------------------------------------------------
+Board::Board(int Width, int Length, char board[Length][Width]){
+Width = 30;
+Length = 30;
+for (int h = 0; h < Length; h++){
+for (int w = 0; w < Width; w++)
+{
+board[h][w] = '.';}}
+
+}
+
+void Board::setWidth(int NewWidth) {   
+    cout << "Enter Board Width : ";
+    cin >> NewWidth;
+    if(NewWidth < 4 || NewWidth>30 )
+    {
+    cout << "Invalid Game Board Width !!" << endl; }
+    else
+    {
+
+    }
+}
+
+int Board::getWidth(int Width, int NewWidth) const {
+    Width = NewWidth;
+} 
+
+
+
+
+void Board::CreateNewBoard(int NewWidth, char board[][NewWidth]){
+    for (int h = 0; h < 6; h++)
+		for (int w = 0; w < NewWidth; w++)
+		{
+			board[h][w] = '.';
+		}
+}
+
+
+
+
+string Board::DrawBoard(int NewWidth, char board[][NewWidth]) // width=7
+{
+
+	string headline = "";
+	string headline_without_spaces = "";
+
+	for (int w = 0; w < NewWidth; w++)
+	{
+		headline = headline + " " + alphabet[w] + " ";
+		headline_without_spaces = headline_without_spaces + alphabet[w];
+	}
+
+	cout << "\n" << headline << endl; //outputs columns label
+
+	for (int h = 0; h < 6; h++) //outputs board
+		for (int w = 0; w < NewWidth; w++)
+		{
+			if (w == NewWidth - 1) //if it's a value in the last column, goes to the next line
+				cout << ' ' << board[h][w] << endl;
+			else
+				cout << ' ' << board[h][w] << ' ';
+		}
+
+	cout << headline << endl;
+
+	return headline_without_spaces;
+
+}
+
+
