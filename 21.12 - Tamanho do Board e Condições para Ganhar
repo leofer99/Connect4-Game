@@ -47,6 +47,7 @@ public:
 	int GetNumLines() const;
 	int GetNumColumns() const;
 	string	GetEmptySymbol() const;
+    int GetConditionsForWinner();
 	void Headline() const;
 	int	GetTopLineIndexAtColumn() const;
 	void SelectColumn(player player, int PossibleColumnSelect) const;
@@ -145,6 +146,11 @@ string Board::GetEmptySymbol() const
 	return this->emptySymbol;
 }
 //----------------------------------------------------------------------------------------------------
+int Board:: GetConditionsForWinner() const
+{
+    return this -> numN;
+}
+//--------------------------------------------------------------------------------------
 int Board::GetTopLineIndexAtColumn() const
 { //parameters: numC, numL, LastColumnPlayed
 	//choose column, every time a play is made, we count the column it refers to
