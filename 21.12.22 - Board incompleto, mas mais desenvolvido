@@ -569,7 +569,7 @@ void GameEnd()
 //-----------------------------------------------------------------------------------------------
 int main()
 {
-	srand(unsigned(time(NULL)); //verificar que é aqui que o prof quer ter 
+	srand( unsigned(time(NULL)) ); //verificar que é aqui que o prof quer ter 
 
 	Game();
 	return 0;
