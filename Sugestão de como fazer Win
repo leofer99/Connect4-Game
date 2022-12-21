@@ -1,0 +1,112 @@
+
+#include<iostream>
+#include<vector>
+#include <string> 
+using namespace std;
+
+int main() {
+
+	vector< vector <string> > board;
+	vector<int> possibleHorizontalWins;
+	vector<int> possibleVerticalWins;
+	vector<int> possibleDiagonalWinsRightToLeft; // (\)
+	vector<int> possibleDiagonalWinsLeftToRight; // (/)
+	
+	int numL,  numC;
+	numL = 6;
+	numC = 7;
+	string emptySymbol = ".";
+	int NotFoundInStr = string::npos;
+
+
+	board = vector <vector<string>>(numL, vector <string>(numC, emptySymbol));
+
+	board[1][1] = "X";
+	board[1][2] = "X";
+	board[1][3] = "X";
+	board[1][4] = "X";
+
+	board[2][4] = "X";
+	board[3][4] = "X";
+	board[4][4] = "X";
+
+	possibleHorizontalWins = vector <int>(numL, 0);
+	possibleVerticalWins = vector <int>(numC, 0);
+	
+	string linWin = "";
+	string ColWin = "";
+
+
+	// Iterator for each vector inside the 2-D vector
+	vector<string>::iterator horizontal_it;
+
+	// Traversing a 2-D vector using iterators
+	for (int i =0; i <numL; i++)
+	{
+		for (horizontal_it = board[i].begin(); horizontal_it != board[i].end(); horizontal_it++)
+		{
+			cout << *horizontal_it << " ";
+		}
+		cout << endl;
+	}
+
+
+
+	// Vitória horizontal
+	for (int i = 0; i < numL; i++)
+	{
+		for (horizontal_it = board[i].begin(); horizontal_it != board[i].end(); horizontal_it++)
+		{
+			linWin = linWin + *horizontal_it;
+			if (linWin.find("XXXX") == NotFoundInStr)
+				possibleHorizontalWins[i] = 0;
+			else
+				possibleHorizontalWins[i] = 1;
+
+
+		}
+		//cout << "\n\n" << linWin << endl;
+		linWin = "";
+
+	}
+
+	// Iterator for the 2-D vector
+	vector<vector<string>>::iterator vertical_it;
+
+
+	vector<string> columnData;
+	columnData = vector <string>(numC, "");
+	int cont = 0;
+
+
+	// Vitória vertical
+	for (int i = 0; i < numC; i++)
+	{
+		for (vertical_it = board.begin(); vertical_it != board.end(); vertical_it++)
+		{
+			columnData = *vertical_it;
+			ColWin = ColWin + columnData[i];
+			if (ColWin.find("XXXX") == NotFoundInStr)
+				possibleVerticalWins[i] = 0;
+			else
+				possibleVerticalWins[i] = 1;
+
+		}
+		//cout << "\n\n" << ColWin << endl;
+		ColWin = "";
+	}
+	
+	cout << "\nVertical" << endl;
+	for (int i=0; i < numC; i++)
+		cout  << possibleVerticalWins[i] << " ";
+
+	cout << "\n";
+	cout << "\Horizontal" << endl;
+	for (int i = 0; i < numL; i++)
+		cout << possibleHorizontalWins[i] << " ";
+
+
+
+
+	
+}
