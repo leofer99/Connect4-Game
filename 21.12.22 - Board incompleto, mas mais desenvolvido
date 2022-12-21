@@ -54,7 +54,7 @@ public:
 	void putDiscAtColumn(player player); //numa determinada coluna
 	bool isFull(int NumberOfPlays, int NumberOfBoardCells) const; //testar se board está cheio
 	void show() const; //mostrar board
-	void isThereAWinner() const; //símbolo do vencedor, e linha e coluna da última jogada.
+	string isThereAWinner() const; //símbolo do vencedor, e linha e coluna da última jogada.
 	void wouldThereBeAWinner() const; //putDisc + winner? (p/ AI) 
 				//(pode estar numa classe complementar - Classe Game : encarregar - se de ver conteúdo, verificar vencedor
 	void AIPlay(int selectedColumn) const;
@@ -328,7 +328,7 @@ string Board::isThereAWinner() const
 		}
 
 
-			return stringColWin;
+			return string ColWin;
 }
 //-----------------------------------------------------------------------------------------------
 void Board::wouldThereBeAWinner() const
@@ -348,7 +348,6 @@ void Board::wouldThereBeAWinner() const
 void Board::AIPlay(int selectedColumn) const
 {
 	wouldThereBeAWinner();
-
 }
 //-----------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------
@@ -443,19 +442,7 @@ player Menu(player Enemy_player)
 	string AI_Medium = "2";
 	string AI_Hard = "3";
 
-	//1st Part: Choose board dimensions
-	while (true)
-	{	
-		int numC; int numL;
-		cout << "Please, set the dimensions of the board. Number of Columns: " << endl;
-		cin >> numC;
-		board.SetNumColumns(numC);
-		cout << endl << "Number of Lines: ";
-		cin >> numL;
-		board.SetNumLines(numL);
-	}
-
-	//2nd Part: Choose the type of Game Mode
+	//1st Part: Choose the type of Game Mode
 	while (true)
 	{
 		cout << "How many people are playing?\n(1-Player VS Computer | 2-Player VS Player): ";
@@ -476,7 +463,7 @@ player Menu(player Enemy_player)
 			cout << "Error! You must input 1 or 2." << endl;
 	}
 
-	//3rd Part: Select Game Difficulty, in case of Player VS Computer
+	//2nd Part: Select Game Difficulty, in case of Player VS Computer
 	if (Enemy_player.GetPlayerType() != "Human")
 		while (true)
 		{
@@ -512,7 +499,6 @@ player Menu(player Enemy_player)
 //-----------------------------------------------------------------------------------------------
 void Game()
 {
-
 	int NumberOfBoardCells = board.GetNumLines() * board.GetNumColumns();
 	int NumberOfPlays = 0;
 
@@ -569,7 +555,7 @@ void GameEnd()
 //-----------------------------------------------------------------------------------------------
 int main()
 {
-	srand( unsigned(time(NULL)) ); //verificar que é aqui que o prof quer ter 
+	srand(unsigned( time(NULL) ) ); //verificar que é aqui que o prof quer ter 
 
 	Game();
 	return 0;
