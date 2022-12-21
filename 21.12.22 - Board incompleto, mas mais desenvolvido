@@ -43,7 +43,7 @@ public:
 	void SetEmptySymbol();
 	int GetNumLines() const;
 	int GetNumColumns() const;
-	int	GetEmptySymbol() const;
+	string	GetEmptySymbol() const;
 	void Headline() const;
 	int	GetTopLineIndexAtColumn() const;
 	void SelectColumn(player player, int PossibleColumnSelect) const;
@@ -100,7 +100,7 @@ int Board::GetNumColumns() const
 	return this->numC;
 }
 //--------------------------------------------------------------------------------------
-int Board::GetEmptySymbol() const
+string Board::GetEmptySymbol() const
 {
 	return this->emptySymbol;
 }
@@ -285,13 +285,13 @@ void Board::isThereAWinner() const
 //-----------------------------------------------------------------------------------------------
 void Board::wouldThereBeAWinner() const
 {
-	vector < vector <string> test_board;
-	board;
+	vector < vector <string> > test_board= board;
 
 	for (int col = 0; col < numC; col++)
 	{
-
-	isThereAWinner()
+		int lin = GetTopLineIndexAtColumn();
+		test_board.at(lin).at(col) = "X";
+		//string isThereAWinnerResult= isThereAWinner(test_board);
 
 	}
 	
@@ -299,7 +299,8 @@ void Board::wouldThereBeAWinner() const
 //-----------------------------------------------------------------------------------------------
 void Board::AIPlay(int selectedColumn) const
 {
-	wouldThereBeAWinner();s
+	wouldThereBeAWinner();
+
 }
 //-----------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------
