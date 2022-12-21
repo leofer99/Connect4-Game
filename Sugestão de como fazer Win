@@ -63,6 +63,11 @@ int main() {
 			else
 				possibleHorizontalWins[i] = 1;
 
+			if (linWin.find("OOOO") == NotFoundInStr)
+				possibleHorizontalWins[i] = 0;
+			else
+				possibleHorizontalWins[i] = -1;
+
 
 		}
 		//cout << "\n\n" << linWin << endl;
@@ -90,6 +95,10 @@ int main() {
 				possibleVerticalWins[i] = 0;
 			else
 				possibleVerticalWins[i] = 1;
+			if (ColWin.find("OOOO") == NotFoundInStr)
+				possibleVerticalWins[i] = 0;
+			else
+				possibleVerticalWins[i] = -1;
 
 		}
 		//cout << "\n\n" << ColWin << endl;
