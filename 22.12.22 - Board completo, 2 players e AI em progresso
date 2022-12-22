@@ -442,44 +442,57 @@ void Board::wouldThereBeAWinner() const
 	}
 }
 //-----------------------------------------------------------------------------------------------
-	void Board::AIPlay(int selectedColumn, string AIlevel) const
-	{
-		//wouldThereBeAWinner(); playerSymbol = "O"
+void Board::AIPlay(int selectedColumn, string AIlevel) const
+{
+	//wouldThereBeAWinner(); playerSymbol = "O"
 
-		vector < vector <string> > test_board = board;
-		// AI Easy - Places pieces randomly.
-		if (AIlevel == "Computer_Easy")
+	vector < vector <string> > test_board = board;
+	// AI Easy - Places pieces randomly.
+	if (AIlevel == "Computer_Easy")
+	{
+		// AI_move = min + (rand() % (int)(max - min + 1)) / min=0 e max=numC
+		int AI_move = rand() % (int)(numC + 1); //random number between 0 and numC
+
+		test_board.at(topline.at(AI_move)).at(AI_move) = "O";
+		board = test_board; // erro?
+	}
+
+
+	// AI Medium - Plays most of the time randomly, except when the AI can get a win or stop the opponent for winning. 
+	else if (AIlevel == "Computer_Medium")
+	{
+		bool change = false;
+		// Insert a piece in every column of the test_board, a copy of the original board.
+
+		for (int i = 0; i < numC; i++)
 		{
-			// AI_move = min + (rand() % (int)(max - min + 1)) / min=0 e max=numC
+			test_board.at(topline.at(i)).at(i) = "O";
+			string winner = board.isThereAWinner(test_board);
+			test_board.at(topline.at(i)).at(i) = emptySymbol;
+
+			if (winner == "Player2")
+				board.at(topline.at(i)).at(i) = "O"; change = true; break; // erro?
+
+			test_board.at(topline.at(i)).at(i) = "X";
+			string winner = board.isThereAWinner(test_board);
+			test_board.at(topline.at(i)).at(i) = emptySymbol;
+
+			if (winner == "Player1")
+				board.at(topline.at(i)).at(i) = "O"; change = true; break; // erro?
+
+
+		}
+
+		if (change == false)
+		{
 			int AI_move = rand() % (int)(numC + 1); //random number between 0 and numC
 
 			test_board.at(topline.at(AI_move)).at(AI_move) = "O";
 			board = test_board; // erro?
+
 		}
-
-
-		// AI Medium - Plays most of the time randomly, except when the AI can get a win or stop the opponent for winning. 
-		else if (AIlevel == "Computer_Medium")
-		{
-
-			// Insert a piece in every column of the test_board, a copy of the original board.
-
-			for (int i = 0; i < numC; i++)
-			{	test_board.at(topline.at(i)).at(i) = "O";
-				string winner = board.isThereAWinner(test_board);
-				test_board.at(topline.at(i)).at(i) = emptySymbol;
-
-				if (winner == "Player2")
-					board.at(topline.at(i)).at(i) = "O"; break; // erro?
-
-				test_board.at(topline.at(i)).at(i) = "X";
-				string winner = board.isThereAWinner(test_board);
-				test_board.at(topline.at(i)).at(i) = emptySymbol;
-
-				if (winner == "Player1")
-					board.at(topline.at(i)).at(i) = "O"; break; // erro?
-			}
-		}
+			
+	}
 
 }
 //-----------------------------------------------------------------------------------------------
