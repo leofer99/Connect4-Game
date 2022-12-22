@@ -765,10 +765,24 @@ void Game()
 	}
 }
 //-----------------------------------------------------------------------------------------------
-void GameEnd(player player1, player player2, string winnerInfo)
+void time
 {
-	string ctrlz;
-	if (ctrlz == "Not Pressed")
+
+time_t t;
+struct tm * infoTime;
+char DayTime[20]; //Where the time information will be saved.
+
+time (&t);
+infoTime = localtime(&t); //Get the time 
+
+strftime(DayTime, 20, "%F / %R" , infoTime); //Creates the Day and Time with the following format YYYY/MM/DD / HH:MM
+
+}
+////-----------------------------------------------------------------------------------------------
+void GameEnd(player player1, player player2, string winnerInfo, DayTime)
+{
+	//string ctrlz;
+	//if (ctrlz == "Not Pressed")
 		//if CTRL-Z is activated, nothing is registered in the file.
 		//if it is not activated/pressed, data is registered in the file
 	{
@@ -776,27 +790,15 @@ void GameEnd(player player1, player player2, string winnerInfo)
 		file.open("winner.txt");// Creates the file 
 
 		// Writes the winner and the time in file in following format: 2022-10-15 / 09:05 – 1)computador vs 2)Pedro Costa – vencedor: 2.
-		file << time;
+		file << DayTime;
 		file << " - 1)" << player1.GetName() << " vs 2)" << player2.GetName() << " - vencedor: " << winnerInfo << "\n";
-		file << "Time : " << time;
+		
 		file.close(); // Close file
 
 		cout << "Saving to the file..." << endl;
 		usleep(2000000); //Sleep the system for 2s 
 		cout << "Thanks for playing, bye :) !! " << endl;
 
-		//cout << "\n\n\n           " << player1.name << ", you WON!\n\n\n";
-		//FILE* arq;
-		//arq = fopen("winner.txt", "wt"); //abre arquivo ou cria um
-		//if (arq == NULL) {
-		//	printf("Erro ao abrir o arquivo\n");
-		//	exit(0);
-		//}
-		//fprintf(arq, "The winner is: ");
-		//fprintf(arq, "%s", player1.name.c_str()); //grava variavel no arquivo
-		//fclose(arq); //fecha o arquivo} 
-		//GameON = 0;
-		//break;
 	}
 }
 //-----------------------------------------------------------------------------------------------
