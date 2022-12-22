@@ -1,0 +1,21 @@
+#define RESET   "\033[0m"
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+
+
+
+player::player(int player_num, string symbol, string player_type)
+{
+	this->player_number = player_num;
+	this->symbol = symbol;
+	this->player_type = player_type;
+	this->name = "";
+
+	if (symbol == "X")
+		this->colour = RED;
+	else if (symbol == "O")
+		this->colour = GREEN;
+}
+
+// não sei se isso roda
