@@ -1,0 +1,51 @@
+#define RESET   "\033[0m"
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+
+void player::SetColor{
+
+char colorX ;
+char colorY;
+
+while ((colorX != 1) || (colorX != 2) || (colorX != 3)){
+cout << "Choose the Color for X (1 - Red, 2 - Green, 3 - Yellow) : ";
+cin >> colorX;
+if (colorX == 1)
+{
+colorX = RED;
+}}
+else if(colorX == 2){
+colorX = GREEN;
+}
+else if(colorX == 3){
+colorX = YELLOW;
+}
+else {
+  cout << "You entered the wrong color. Select (1 - Red, 2 - Green, 3 - Yellow)";
+}
+while ((colorY != 1) || (colorY != 2) || (colorY != 3)){
+cout << "Choose the Color for Y (1 - Red, 2 - Green, 3 - Yellow) : ";
+cin >> colorY;}
+if (colorX == colorY){
+cout << "Please, select a diferent color for Y! \n";
+cin >> colorY;
+}
+if (colorX == 1)
+{
+colorX = RED;
+}
+else if(colorX == 2){
+colorX = GREEN;
+}
+else if(colorX == 3){
+colorX = YELLOW;
+}
+else {
+  cout << "You entered the wrong color. Select (1 - Red, 2 - Green, 3 - Yellow)";
+}
+}
+
+
+// O erro que aparece é : assigning to 'char' from incompatible type 'const char[6]' 
+// Se alguém souber alterar
