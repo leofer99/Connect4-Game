@@ -13,7 +13,7 @@
 #include <algorithm>
 #include <set>
 //#include <unistd.h> //for usleep in linux 
-#include <windows.h> //for usleep in windows
+#include <windows.h> //for sleep in windows
 
 #define RESET   "\033[0m"
 #define RED     "\033[31m"      /* Red */
@@ -37,7 +37,7 @@ private:
 	string headline;
 	string winnerSequence1;
 	string winnerSequence2;
-	int NumberOfBoardCells = numC * numL;
+	int NumberOfBoardCells = numC*numL;
 
 	//Guardar linha e coluna da última jogada(procurar se há vencedor, apartir dessa posição)
 	int LastLinePlayed, LastColumnPlayed;
@@ -47,11 +47,11 @@ private:
 	//Guardar LastDiscSymbol(procurar apenas o caráter do último vencedor)
 
 public:
-	Board(int numL, int numC, char emptySymbol, int winnersequencelength);
+	Board(int numL, int numC, string emptySymbol, int winnersequencelength);
 	void SetEmptySymbol();
 	//void SetNumLines();
 	//void SetNumColumns();
-	void SetConditionsForWinner();
+	//void SetConditionsForWinner();
 	int GetNumLines() const;
 	int GetNumColumns() const;
 	string	GetEmptySymbol() const;
@@ -59,16 +59,16 @@ public:
 	int	GetTopLineIndexAtColumn() const;
 	int SelectColumn(player player) const;
 	void putDiscAtColumn(player player, int LastPlayedColumn); //numa determinada coluna
-	bool isFull(int NumberOfPlays, int NumberOfBoardCells) const; //testar se board está cheio
+	string isFull(int NumberOfPlays, int NumberOfBoardCells) const; //testar se board está cheio
 	void show() const; //mostrar board
-	void isThereAWinner() const; //símbolo do vencedor, e linha e coluna da última jogada.
+	string isThereAWinner() const; //símbolo do vencedor, e linha e coluna da última jogada.
 	void wouldThereBeAWinner() const; //putDisc + winner? (p/ AI) 
 	//(pode estar numa classe complementar - Classe Game : encarregar - se de ver conteúdo, verificar vencedor
 	void AIPlay(int selectedColumn) const;
 
 };
 //--------------------------------------------------------------------------------------
-Board::Board(int numL, int numC, char emptySymbol, int winnersequencelength)
+Board::Board(int numL, int numC, string emptySymbol, int winnersequencelength)
 {
 	this->numL = numL;
 	this->numC = numC;
@@ -163,7 +163,7 @@ string Board::GetEmptySymbol() const
 	return this->emptySymbol;
 }
 //----------------------------------------------------------------------------------------------------
-int Board::GetTopLineIndexAtColumn( ) const
+int Board::GetTopLineIndexAtColumn() const
 { /* Function used to find the line where the disc will be placed.
 At the start of the game, topline has numC elements equal to numL-1. Every time a disc is inserted, 
 the value saved for that corresponding column decreases by 1. Hence, if we play in the same column again, we will play in a line higher by 1,
@@ -171,11 +171,11 @@ When the value is 0, it will play at the top of the column. When the value is -1
 */
 
 	// after every play: 
-	
-		topline.at(PossibleColumnSelected)= ColumnHeight+1;
+	int ColumnHeight = topline.at(LastColumnPlayed);
+	LastLinePlayed= ColumnHeight - 1;
+	topline.at(LastColumnPlayed)= ColumnHeight-1;
 
-	// 
-	//return  ;
+	return LastLinePlayed;
 }
 //-----------------------------------------------------------------------------------------------
 int Board::SelectColumn(player player) const
@@ -230,9 +230,8 @@ void Board::putDiscAtColumn(player player, int LastColumnPlayed)
 {	//works for both AI and Player
 
 	this->LastColumnPlayed= LastColumnPlayed;
-	this->LastLinePlayed= GetTopLineIndexAtColumn();
+	this->LastLinePlayed= GetTopLineIndexAtColumn(LastColumnPlayed);
 	this->LastDiscSymbol= player.GetSymbol();
-
 	board.at(LastLinePlayed).at(LastColumnPlayed) = LastDiscSymbol;
 }
 //-----------------------------------------------------------------------------------------------
@@ -241,12 +240,9 @@ string Board::isFull(int NumberOfPlays, int NumberOfBoardCells) const
 	string isThereATie = "There is no tie";
 
 	if (NumberOfPlays == NumberOfBoardCells)
-		isFull = true; 
+		isThereATie = "It's a Tie!";
 
-	//ends game
-	//else, continues game
-	return isFull;
-
+	return isThereATie;
 }
 //-----------------------------------------------------------------------------------------------
 void Board::Headline() const
@@ -281,7 +277,7 @@ void Board::show() const
 }
 //-----------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------
-string Board::isThereAWinner(vector<vector<string>> board) const
+string Board::isThereAWinner() const
 {
 	//checking for horizontal win:
 	string lineWin = "";
@@ -446,57 +442,44 @@ void Board::wouldThereBeAWinner() const
 	}
 }
 //-----------------------------------------------------------------------------------------------
-void Board::AIPlay(int selectedColumn, string AIlevel) const
-{
-	//wouldThereBeAWinner(); playerSymbol = "O"
-
-	vector < vector <string> > test_board = board;
-	// AI Easy - Places pieces randomly.
-	if (AIlevel == "Computer_Easy")
+	void Board::AIPlay(int selectedColumn, string AIlevel) const
 	{
-		// AI_move = min + (rand() % (int)(max - min + 1)) / min=0 e max=numC
-		int AI_move = rand() % (int)(numC + 1); //random number between 0 and numC
+		//wouldThereBeAWinner(); playerSymbol = "O"
 
-		test_board.at(topline.at(AI_move)).at(AI_move) = "O";
-		board = test_board; // erro?
-	}
-
-
-	// AI Medium - Plays most of the time randomly, except when the AI can get a win or stop the opponent for winning. 
-	else if (AIlevel == "Computer_Medium")
-	{
-		bool change = false;
-		// Insert a piece in every column of the test_board, a copy of the original board.
-
-		for (int i = 0; i < numC; i++)
+		vector < vector <string> > test_board = board;
+		// AI Easy - Places pieces randomly.
+		if (AIlevel == "Computer_Easy")
 		{
-			test_board.at(topline.at(i)).at(i) = "O";
-			string winner = board.isThereAWinner(test_board);
-			test_board.at(topline.at(i)).at(i) = emptySymbol;
-
-			if (winner == "Player2")
-				board.at(topline.at(i)).at(i) = "O"; change = true; break; // erro?
-
-			test_board.at(topline.at(i)).at(i) = "X";
-			string winner = board.isThereAWinner(test_board);
-			test_board.at(topline.at(i)).at(i) = emptySymbol;
-
-			if (winner == "Player1")
-				board.at(topline.at(i)).at(i) = "O"; change = true; break; // erro?
-
-
-		}
-
-		if (change == false)
-		{
+			// AI_move = min + (rand() % (int)(max - min + 1)) / min=0 e max=numC
 			int AI_move = rand() % (int)(numC + 1); //random number between 0 and numC
 
 			test_board.at(topline.at(AI_move)).at(AI_move) = "O";
 			board = test_board; // erro?
-
 		}
-			
-	}
+
+
+		// AI Medium - Plays most of the time randomly, except when the AI can get a win or stop the opponent for winning. 
+		else if (AIlevel == "Computer_Medium")
+		{
+
+			// Insert a piece in every column of the test_board, a copy of the original board.
+
+			for (int i = 0; i < numC; i++)
+			{	test_board.at(topline.at(i)).at(i) = "O";
+				string winner = board.isThereAWinner(test_board);
+				test_board.at(topline.at(i)).at(i) = emptySymbol;
+
+				if (winner == "Player2")
+					board.at(topline.at(i)).at(i) = "O"; break; // erro?
+
+				test_board.at(topline.at(i)).at(i) = "X";
+				string winner = board.isThereAWinner(test_board);
+				test_board.at(topline.at(i)).at(i) = emptySymbol;
+
+				if (winner == "Player1")
+					board.at(topline.at(i)).at(i) = "O"; break; // erro?
+			}
+		}
 
 }
 //-----------------------------------------------------------------------------------------------
@@ -530,9 +513,9 @@ player::player(int player_num, string symbol, string player_type)
 	this->name = "";
 
 	if (symbol == "X")
-		this->colour = RED;
+		this->colour = "red";
 	else if (symbol == "O")
-		this->colour = BLUE;
+		this->colour = "blue";
 }
 //----------------------------------------------------------------------------------------------------
 void player::InputName()
@@ -647,6 +630,9 @@ player Menu(player Enemy_player)
 }
 //-----------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------
+/*End of Class player. 
+Start of Functions to help play the game*/
+//-----------------------------------------------------------------------------------------------
 int SetNumLines()
 {
 	int numL = 0;
@@ -703,8 +689,6 @@ void Game()
 	int numC = SetNumColumns();
 	int numN = SetConditionsForWinner(); //user chooses winner length sequence
 
-	string winnerSequence1(numN, 'X');
-	string winnerSequence2(numN, 'O');
 	string emptySymbol = ".";
 
 	Board board = Board(numL, numC, emptySymbol, numN);
@@ -765,47 +749,57 @@ void Game()
 	}
 }
 //-----------------------------------------------------------------------------------------------
-void time
-{
+char time()
+{	time_t t;
+	struct tm* infoTime;
+	char DayTime[20]; //Where the time information will be saved.
 
-time_t t;
-struct tm * infoTime;
-char DayTime[20]; //Where the time information will be saved.
+	time(&t);
+	infoTime = localtime(&t); //Get the time 
 
-time (&t);
-infoTime = localtime(&t); //Get the time 
+	strftime(DayTime, 20, "%F / %R" , infoTime); //Creates the Day and Time with the following format YYYY/MM/DD / HH:MM
 
-strftime(DayTime, 20, "%F / %R" , infoTime); //Creates the Day and Time with the following format YYYY/MM/DD / HH:MM
-
+	return DayTime[20];
 }
-////-----------------------------------------------------------------------------------------------
-void GameEnd(player player1, player player2, string winnerInfo, DayTime)
+//-----------------------------------------------------------------------------------------------
+void GameEnd(player player1, player player2, string winnerInfo)
 {
-	//string ctrlz;
-	//if (ctrlz == "Not Pressed")
+	string ctrlz;
+	if (ctrlz == "Not Pressed")
+	{
 		//if CTRL-Z is activated, nothing is registered in the file.
 		//if it is not activated/pressed, data is registered in the file
-	{
+	
 		ofstream file;
 		file.open("winner.txt");// Creates the file 
 
 		// Writes the winner and the time in file in following format: 2022-10-15 / 09:05 – 1)computador vs 2)Pedro Costa – vencedor: 2.
-		file << DayTime;
+		file << time();
 		file << " - 1)" << player1.GetName() << " vs 2)" << player2.GetName() << " - vencedor: " << winnerInfo << "\n";
-		
 		file.close(); // Close file
 
 		cout << "Saving to the file..." << endl;
-		usleep(2000000); //Sleep the system for 2s 
+		unsigned sleep(2); //Sleep the system for 2s 
 		cout << "Thanks for playing, bye :) !! " << endl;
 
+		//cout << "\n\n\n           " << player1.name << ", you WON!\n\n\n";
+		//FILE* arq;
+		//arq = fopen("winner.txt", "wt"); //abre arquivo ou cria um
+		//if (arq == NULL) {
+		//	printf("Erro ao abrir o arquivo\n");
+		//	exit(0);
+		//}
+		//fprintf(arq, "The winner is: ");
+		//fprintf(arq, "%s", player1.name.c_str()); //grava variavel no arquivo
+		//fclose(arq); //fecha o arquivo} 
+		//GameON = 0;
+		//break;
 	}
 }
 //-----------------------------------------------------------------------------------------------
 int main()
 {
-	srand(unsigned(time(NULL))); //verificar que é aqui que o prof quer ter 
-
+	srand(unsigned(time(NULL))); 
 	Game();
 	return 0;
 }
