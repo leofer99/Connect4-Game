@@ -1,5 +1,5 @@
 #include <iostream>
- #include <fstream> // allows to read and write .txt files
+#include <fstream> // allows to read and write .txt files
 #include <cmath>
 #include <iomanip>
 #include <cstddef>
@@ -9,9 +9,11 @@
 #include <string>
 #include <cctype>
 #include <vector>
- #include <sstream>
+#include <sstream>
 #include <algorithm>
 #include <set>
+//#include <unistd.h> //for usleep in linux 
+#include <windows.h> //for usleep in windows
 
 using namespace std;
 
@@ -49,14 +51,14 @@ public:
 	string	GetEmptySymbol() const;
 	void Headline() const;
 	int	GetTopLineIndexAtColumn() const;
-	void SelectColumn(player player, int PossibleColumnSelect) const;
+	int SelectColumn(player player) const;
 	void SetSelectedColumn(int PossibleSelectedColumn);
 	void putDiscAtColumn(player player); //numa determinada coluna
 	bool isFull(int NumberOfPlays, int NumberOfBoardCells) const; //testar se board está cheio
 	void show() const; //mostrar board
 	void isThereAWinner() const; //símbolo do vencedor, e linha e coluna da última jogada.
 	void wouldThereBeAWinner() const; //putDisc + winner? (p/ AI) 
-				//(pode estar numa classe complementar - Classe Game : encarregar - se de ver conteúdo, verificar vencedor
+	//(pode estar numa classe complementar - Classe Game : encarregar - se de ver conteúdo, verificar vencedor
 	void AIPlay(int selectedColumn) const;
 
 };
@@ -66,7 +68,7 @@ Board::Board(int numL, int numC, char emptySymbol, int winnersequencelength)
 	this->numL = numL;
 	this->numC = numC;
 	this->emptySymbol = emptySymbol;
-	this->board = vector <vector<string> >(numL, vector <string>(numC, emptySymbol) );
+	this->board = vector <vector<string> >(numL, vector <string>(numC, emptySymbol));
 }
 //--------------------------------------------------------------------------------------
 void Board::SetEmptySymbol()
@@ -158,41 +160,43 @@ int Board::GetTopLineIndexAtColumn() const
 	//return this-> ;
 }
 //-----------------------------------------------------------------------------------------------
-void Board::SelectColumn(player player, int PossibleColumnSelected) const
+int Board::SelectColumn(player player) const
 {
 	string InputedColumn = "";
 	//const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	string PlayerName = player.GetName();
 	string PlayerType = player.GetPlayerType();
-	int Not_found = -1;	
-	int PossibleColumnSelected=-1;
+	int Not_found = -1;
+	int PossibleColumnSelected = -1;
 
-			if ((PlayerType == "Human"))
+	if ((PlayerType == "Human"))
+	{
+		while (true)
+		{
+			cout << "\n" << PlayerName << ", in which column, do you want to insert your piece?" << endl;
+			cin >> InputedColumn;
+
+
+			if ((InputedColumn.size() != 1) || (int(InputedColumn[0]) > int('z'))) // garante que o input é somente uma letra
+				InputedColumn = "_"; //in this case, it will not detect the value in the headline and will output an error
+
+			if (int(InputedColumn[0]) > int('Z')) // garante que as minusculas sejam convertidas em maiúsculas
+				InputedColumn[0] = char(int(InputedColumn[0]) - 32);
+
+			PossibleColumnSelected = int(headline.find(InputedColumn[0]));
+
+			if (PossibleColumnSelected == Not_found) // garante que o inputed_column averiguado encontra-se na headline
+				cout << "\nError! You must insert a valid input." << endl;
+			else
 			{
-				while (true)
-				{
-					cout << "\n" << PlayerName << ", in which column, do you want to insert your piece?" << endl;
-					cin >> InputedColumn;
-
-
-					if ((InputedColumn.size() != 1) || (int(InputedColumn[0]) > int('z'))) // garante que o input é somente uma letra
-						InputedColumn = "_"; //in this case, it will not detect the value in the headline and will output an error
-
-					if (int(InputedColumn[0]) > int('Z')) // garante que as minusculas sejam convertidas em maiúsculas
-						InputedColumn[0] = char(int(InputedColumn[0]) - 32);
-
-					PossibleColumnSelected = int( headline.find(InputedColumn[0]) );
-
-					if (PossibleColumnSelected == Not_found) // garante que o inputed_column averiguado encontra-se na headline
-						cout << "\nError! You must insert a valid input." << endl;
-					else
-					{
-						break;
-					}
-				}
+				break;
 			}
-			else //if the player_type is AI, does nothing
-				PossibleColumnSelected = AI_selectedColumn;
+		}
+	}
+	else //if the player_type is AI, does nothing
+		PossibleColumnSelected = AI_selectedColumn;
+
+	return PossibleColumnSelected;
 }
 //-----------------------------------------------------------------------------------------------
 void Board::SetSelectedColumn(int PossibleColumnSelected)
@@ -200,9 +204,9 @@ void Board::SetSelectedColumn(int PossibleColumnSelected)
 	this->ColumnSelected = PossibleColumnSelected;
 }
 //-----------------------------------------------------------------------------------------------
-void Board::putDiscAtColumn(player player) 
+void Board::putDiscAtColumn(player player)
 {
-	int TopLineIndex= GetTopLineIndexAtColumn();
+	int TopLineIndex = GetTopLineIndexAtColumn();
 	board[TopLineIndex][ColumnSelected] = player.GetSymbol();
 }
 //-----------------------------------------------------------------------------------------------
@@ -212,11 +216,11 @@ bool Board::isFull(int NumberOfPlays, int NumberOfBoardCells) const
 
 	if (NumberOfPlays == NumberOfBoardCells)
 		isFull = true;
-		cout << "It is a tie! " << endl;
+	cout << "It is a tie! " << endl;
 
 	//ends game
 	//else, continues game
-		return isFull;
+	return isFull;
 
 }
 //-----------------------------------------------------------------------------------------------
@@ -340,7 +344,7 @@ void Board::isThereAWinner() const
 		{
 			for (int i = 0; i < HighestDimension; i++)
 			{
-				if ((lin+i < numL) && (col+i < numC))
+				if ((lin + i < numL) && (col + i < numC))
 					PositiveDiagonalWin = PositiveDiagonalWin + board.at(lin + i).at(col + i);
 				else
 					break;
@@ -365,12 +369,12 @@ void Board::isThereAWinner() const
 		{
 			for (int i = 0; i < HighestDimension; i++)
 			{
-					if ((lin+i < numL) && (col-i >= 0))
-					{
-						NegativeDiagonalWin = NegativeDiagonalWin + board.at(lin + i).at(col - i);
-					}
-					else
-						break;
+				if ((lin + i < numL) && (col - i >= 0))
+				{
+					NegativeDiagonalWin = NegativeDiagonalWin + board.at(lin + i).at(col - i);
+				}
+				else
+					break;
 			}
 
 			if (NegativeDiagonalWin.find(winnerSequence1) != NotFoundInStr)
@@ -388,7 +392,7 @@ void Board::isThereAWinner() const
 //-----------------------------------------------------------------------------------------------
 void Board::wouldThereBeAWinner() const
 {
-	vector < vector <string> > test_board= board;
+	vector < vector <string> > test_board = board;
 
 	for (int col = 0; col < numC; col++)
 	{
@@ -397,7 +401,7 @@ void Board::wouldThereBeAWinner() const
 		//string isThereAWinnerResult= isThereAWinner(test_board);
 
 	}
-	
+
 }
 //-----------------------------------------------------------------------------------------------
 void Board::AIPlay(int selectedColumn) const
@@ -605,26 +609,27 @@ void Game()
 	player2.InputName();
 
 	//Board Set-Up
-	int numL=SetNumLines(); //user chooses board size
-	int numC=SetNumColumns();
-	int numN=SetConditionsForWinner(); //user chooses winner length sequence
+	int numL = SetNumLines(); //user chooses board size
+	int numC = SetNumColumns();
+	int numN = SetConditionsForWinner(); //user chooses winner length sequence
 	string emptySymbol = ".";
 
 	Board board = Board(numL, numC, emptySymbol, numN);
 
 	board.SetEmptySymbol(); //user chooses empty symbol
-	
+
 	int NumberOfBoardCells = numL * numC;
 	int NumberOfPlays = 0;
+	string winnerInfo = {};
 
 	//Game Start
 	while (true)
 	{
 		string GameResult = "No Winner Yet";
 		board.show(); //shows board with headline directly above and below
-		board.selectColumn();
-		board.putDiscAtColumn();
-		NumberOfPlays = NumberOfPlays+1;
+		int PossibleColumnSelected= board.SelectColumn(player1);
+		board.putDiscAtColumn(PossibleColumnSelected);
+		NumberOfPlays = NumberOfPlays + 1;
 		GameResult = board.isThereAWinner(); //tests if there is a winner
 
 		if (GameResult == "IsWinner")
@@ -632,34 +637,53 @@ void Game()
 
 		else
 		{
-		 string IsThereATie = board.isFull(NumberOfPlays, NumberOfBoardCells);
-		 if (IsThereATie == "It's a Tie!")
-			 GameEnd(); //game ends
+			string IsThereATie = board.isFull(NumberOfPlays, NumberOfBoardCells);
+			if (IsThereATie == "It's a Tie!")
+				winnerInfo = "Empate, não há vencedor.";
+				GameEnd(player1, player2, winnerInfo); //game ends
 		}
 
 	}
 }
 //-----------------------------------------------------------------------------------------------
-void GameEnd()
+void GameEnd(player player1, player player2, string winnerInfo)
 {
-	//cout << "\n\n\n           " << player1.name << ", you WON!\n\n\n";
-	//FILE* arq;
-	//arq = fopen("winner.txt", "wt"); //abre arquivo ou cria um
-	//if (arq == NULL) {
-	//	printf("Erro ao abrir o arquivo\n");
-	//	exit(0);
-	//}
-	//fprintf(arq, "The winner is: ");
-	//fprintf(arq, "%s", player1.name.c_str()); //grava variavel no arquivo
-	//fclose(arq); //fecha o arquivo} 
-	//GameON = 0;
-	//break;
+	string ctrlz;
+	if (ctrlz == "Not Pressed")
+		//if CTRL-Z is activated, nothing is registered in the file.
+		//if it is not activated/pressed, data is registered in the file
+	{
+		ofstream file;
+		file.open("winner.txt");// Creates the file 
 
+		// Writes the winner and the time in file in following format: 2022-10-15 / 09:05 – 1)computador vs 2)Pedro Costa – vencedor: 2.
+		file << time;
+		file << " - 1)" << player1.GetName() << " vs 2)" << player2.GetName() << " - vencedor: " << winnerInfo << "\n";
+		file << "Time : " << time;
+		file.close(); // Close file
+
+		cout << "Saving to the file..." << endl;
+		usleep(2000000); //Sleep the system for 2s 
+		cout << "Thanks for playing, bye :) !! " << endl;
+
+		//cout << "\n\n\n           " << player1.name << ", you WON!\n\n\n";
+		//FILE* arq;
+		//arq = fopen("winner.txt", "wt"); //abre arquivo ou cria um
+		//if (arq == NULL) {
+		//	printf("Erro ao abrir o arquivo\n");
+		//	exit(0);
+		//}
+		//fprintf(arq, "The winner is: ");
+		//fprintf(arq, "%s", player1.name.c_str()); //grava variavel no arquivo
+		//fclose(arq); //fecha o arquivo} 
+		//GameON = 0;
+		//break;
+	}
 }
 //-----------------------------------------------------------------------------------------------
 int main()
 {
-	srand(unsigned( time(NULL) ) ); //verificar que é aqui que o prof quer ter 
+	srand(unsigned(time(NULL))); //verificar que é aqui que o prof quer ter 
 
 	Game();
 	return 0;
