@@ -24,9 +24,9 @@ using namespace std;
 class Board
 {
 private:
-	vector <char> topline; //representa a linha vazia mais baixa (para jogar nessa quando for escolhida essa coluna, para não ter de procurar nas linhas acima)
+	vector <int> topline; //representa a linha vazia mais baixa (para jogar nessa quando for escolhida essa coluna, para não ter de procurar nas linhas acima)
 	vector <char> ColumnLegend;
-	vector< vector <string> > board;
+	vector< vector<string>> board;
 	int numL, numC, numN;
 	string emptySymbol; //flexibilidade do que é considerado espaço vazio no tabuleiro.
 	int numEmptyCells; //(fica - 1 a cada jogada.Ao chegar a zero, declara empate se ninguém tiver dado.)
@@ -34,9 +34,9 @@ private:
 	int NumberOfBoardCells = numC * numL;
 
 	//Guardar linha e coluna da última jogada(procurar se há vencedor, apartir dessa posição)
-	int lastLine, lastColumn;
-	char LastDiscSymbol;
-	int ColumnSelected;
+	int LastLinePlayed, LastColumnPlayed;
+	string LastDiscSymbol;
+	//int ColumnSelected;
 	int AI_selectedColumn;
 	//Guardar LastDiscSymbol(procurar apenas o caráter do último vencedor)
 
@@ -52,8 +52,7 @@ public:
 	void Headline() const;
 	int	GetTopLineIndexAtColumn() const;
 	int SelectColumn(player player) const;
-	void SetSelectedColumn(int PossibleSelectedColumn);
-	void putDiscAtColumn(player player); //numa determinada coluna
+	void putDiscAtColumn(player player, int LastPlayedColumn); //numa determinada coluna
 	bool isFull(int NumberOfPlays, int NumberOfBoardCells) const; //testar se board está cheio
 	void show() const; //mostrar board
 	void isThereAWinner() const; //símbolo do vencedor, e linha e coluna da última jogada.
@@ -68,7 +67,8 @@ Board::Board(int numL, int numC, char emptySymbol, int winnersequencelength)
 	this->numL = numL;
 	this->numC = numC;
 	this->emptySymbol = emptySymbol;
-	this->board = vector <vector<string> >(numL, vector <string>(numC, emptySymbol));
+	this->topline= vector<int>(numC, numL - 1);
+	this->board = vector <vector<string>>(numL, vector<string>(numC, emptySymbol));
 }
 //--------------------------------------------------------------------------------------
 void Board::SetEmptySymbol()
@@ -153,11 +153,19 @@ string Board::GetEmptySymbol() const
 	return this->emptySymbol;
 }
 //----------------------------------------------------------------------------------------------------
-int Board::GetTopLineIndexAtColumn() const
-{ //parameters: numC, numL, LastColumnPlayed
-	//choose column, every time a play is made, we count the column it refers to
-	//topline - vector<int>
-	//return this-> ;
+int Board::GetTopLineIndexAtColumn( ) const
+{ /* Function used to find the line where the disc will be placed.
+At the start of the game, topline has numC elements equal to numL-1. Every time a disc is inserted, 
+the value saved for that corresponding column decreases by 1. Hence, if we play in the same column again, we will play in a line higher by 1,
+When the value is 0, it will play at the top of the column. When the value is -1, the column is full. 
+*/
+
+	// after every play: 
+	
+		topline.at(PossibleColumnSelected)= ColumnHeight+1;
+
+	// 
+	//return  ;
 }
 //-----------------------------------------------------------------------------------------------
 int Board::SelectColumn(player player) const
@@ -168,10 +176,11 @@ int Board::SelectColumn(player player) const
 	string PlayerType = player.GetPlayerType();
 	int Not_found = -1;
 	int PossibleColumnSelected = -1;
+	string IsColumnValid = "Invalid";
 
 	if ((PlayerType == "Human"))
 	{
-		while (true)
+		while (IsColumnValid == "Invalid")
 		{
 			cout << "\n" << PlayerName << ", in which column, do you want to insert your piece?" << endl;
 			cin >> InputedColumn;
@@ -180,43 +189,49 @@ int Board::SelectColumn(player player) const
 			if ((InputedColumn.size() != 1) || (int(InputedColumn[0]) > int('z'))) // garante que o input é somente uma letra
 				InputedColumn = "_"; //in this case, it will not detect the value in the headline and will output an error
 
-			if (int(InputedColumn[0]) > int('Z')) // garante que as minusculas sejam convertidas em maiúsculas
+			if (int(InputedColumn[0]) > int('Z')) // garante que as minúusculas sejam convertidas em maiúsculas
 				InputedColumn[0] = char(int(InputedColumn[0]) - 32);
 
 			PossibleColumnSelected = int(headline.find(InputedColumn[0]));
 
 			if (PossibleColumnSelected == Not_found) // garante que o inputed_column averiguado encontra-se na headline
 				cout << "\nError! You must insert a valid input." << endl;
-			else
+			
+			else //if the value is valid
 			{
-				break;
+				int ColumnHeight = topline.at(PossibleColumnSelected);
+				if (ColumnHeight <= -1) //if top is reached, must play another column.
+					cout << "\nAttention! Column is full, choose another." << endl;
+
+				else //column is valid, while loop stops
+					IsColumnValid = "Valid";
 			}
 		}
 	}
-	else //if the player_type is AI, does nothing
+	else //when the player_type is AI
 		PossibleColumnSelected = AI_selectedColumn;
 
-	return PossibleColumnSelected;
+	int LastColumnPlayed = PossibleColumnSelected;
+	
+	return LastColumnPlayed;
 }
 //-----------------------------------------------------------------------------------------------
-void Board::SetSelectedColumn(int PossibleColumnSelected)
+void Board::putDiscAtColumn(player player, int LastColumnPlayed)
 {	//works for both AI and Player
-	this->ColumnSelected = PossibleColumnSelected;
+
+	this->LastColumnPlayed= LastColumnPlayed;
+	this->LastLinePlayed= GetTopLineIndexAtColumn();
+	this->LastDiscSymbol= player.GetSymbol();
+
+	board.at(LastLinePlayed).at(LastColumnPlayed) = LastDiscSymbol;
 }
 //-----------------------------------------------------------------------------------------------
-void Board::putDiscAtColumn(player player)
+string Board::isFull(int NumberOfPlays, int NumberOfBoardCells) const
 {
-	int TopLineIndex = GetTopLineIndexAtColumn();
-	board[TopLineIndex][ColumnSelected] = player.GetSymbol();
-}
-//-----------------------------------------------------------------------------------------------
-bool Board::isFull(int NumberOfPlays, int NumberOfBoardCells) const
-{
-	bool isFull = false;
+	string isThereATie = "There is no tie";
 
 	if (NumberOfPlays == NumberOfBoardCells)
-		isFull = true;
-	cout << "It is a tie! " << endl;
+		isFull = true; 
 
 	//ends game
 	//else, continues game
@@ -256,20 +271,23 @@ void Board::show() const
 }
 //-----------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------
-void Board::isThereAWinner() const
+string Board::isThereAWinner(vector<vector<string>> board) const
 {
 	//checking for horizontal win:
 	string lineWin = "";
 	for (int lin = 0; lin < GetNumLines() - 1; lin++)
 
-		vector< vector <string> > poard; //?????????????
+		//vector< vector <string> > poard; //?????????????
 
-	int HighestDimension = max(numC, numL);
-	int LowestDimension = min(numL, numC);
+	//vector< int> possibleHorizontalWins;
+	//possibleHorizontalWins = vector <int>(numL, 0);
+	//vector<int> possibleVerticalWins = vector <int>(numC, 0);
 
-	vector< int> possibleHorizontalWins;
-	possibleHorizontalWins = vector <int>(numL, 0);
-	vector<int> possibleVerticalWins = vector <int>(numC, 0);
+
+		int HighestDimension;
+	int LowestDimension;
+	int possibleHorizontalWins = 0;
+	int possibleVerticalWins = 0;
 	int possibleNegativeDiagonalWins = 0; // (\)
 	int possiblePositiveDiagonalWins = 0; // (/)
 	string linWin = "";
@@ -293,14 +311,14 @@ void Board::isThereAWinner() const
 		{
 			linWin = linWin + *horizontal_it;
 			if (linWin.find(winnerSequence1) == NotFoundInStr)
-				possibleHorizontalWins.at(lin) = 0;
+				possibleHorizontalWins += 0;
 			else
-				possibleHorizontalWins.at(lin) = 1;
+				possibleHorizontalWins += 1;
 
-			if ((linWin.find(winnerSequence2) == NotFoundInStr) && (possibleHorizontalWins.at(lin) != 1))
-				possibleHorizontalWins.at(lin) = 0;
-			else if (possibleHorizontalWins.at(lin) != 1)
-				possibleHorizontalWins.at(lin) = -1;
+			if ((linWin.find(winnerSequence2) == NotFoundInStr) && (possibleHorizontalWins < 1))
+				possibleHorizontalWins += 0;
+			else if (possibleHorizontalWins < 1)
+				possibleHorizontalWins += -1;
 
 		}
 		//cout << "\n\n" << linWin << endl;
@@ -322,14 +340,14 @@ void Board::isThereAWinner() const
 			boardLine = *vertical_it; //analyses each line of the board and takes the 1st element, forming the 1st column. Keeps going for every column. 
 			ColWin = ColWin + boardLine.at(col);
 			if (ColWin.find(winnerSequence1) == NotFoundInStr)
-				possibleVerticalWins.at(col) = 0;
+				possibleVerticalWins += 0;
 			else
-				possibleVerticalWins.at(col) = 1;
+				possibleVerticalWins += 1;
 
-			if ((ColWin.find(winnerSequence2) == NotFoundInStr) && (possibleVerticalWins.at(col) != 1))
-				possibleVerticalWins.at(col) = 0;
-			else if (possibleVerticalWins.at(col) != 1)
-				possibleVerticalWins.at(col) = -1;
+			if ((ColWin.find(winnerSequence2) == NotFoundInStr) && (possibleVerticalWins < 1))
+				possibleVerticalWins += 0;
+			else if (possibleVerticalWins < 1)
+				possibleVerticalWins += -1;
 
 		}
 		ColWin = ""; //cleaning
@@ -337,6 +355,8 @@ void Board::isThereAWinner() const
 
 	//PositiveDiagonalWin PossiblePositiveDiagonalWin
 	// Vitória diagonalLeftToRight (/)
+	int HighestDimension = max(numC, numL);
+	int LowestDimension = min(numL, numC);
 
 	for (int col = 0; col < numC; col++)
 	{
@@ -353,7 +373,7 @@ void Board::isThereAWinner() const
 			if (PositiveDiagonalWin.find(winnerSequence1) != NotFoundInStr) //if we find player1 win 
 				possiblePositiveDiagonalWins += 1;
 
-			else if ((PositiveDiagonalWin.find(winnerSequence2) != NotFoundInStr) && (possibleVerticalWins.at(col) < 1)) //if we find player2 win
+			else if ((PositiveDiagonalWin.find(winnerSequence2) != NotFoundInStr) && (possibleVerticalWins < 1)) //if we find player2 win
 				possiblePositiveDiagonalWins += -1;
 
 			PositiveDiagonalWin = "";
@@ -370,8 +390,7 @@ void Board::isThereAWinner() const
 			for (int i = 0; i < HighestDimension; i++)
 			{
 				if ((lin + i < numL) && (col - i >= 0))
-				{
-					NegativeDiagonalWin = NegativeDiagonalWin + board.at(lin + i).at(col - i);
+				{	NegativeDiagonalWin = NegativeDiagonalWin + board.at(lin + i).at(col - i);
 				}
 				else
 					break;
@@ -380,12 +399,31 @@ void Board::isThereAWinner() const
 			if (NegativeDiagonalWin.find(winnerSequence1) != NotFoundInStr)
 				possibleNegativeDiagonalWins += 1;
 
-			else if ((PositiveDiagonalWin.find(winnerSequence2) != NotFoundInStr) && (possibleVerticalWins.at(col) < 1))
+			else if ((PositiveDiagonalWin.find(winnerSequence2) != NotFoundInStr) && (possibleVerticalWins < 1))
 				possibleNegativeDiagonalWins += -1;
 
 			NegativeDiagonalWin = "";
 		}
 	}
+
+	string winner = "";
+
+	if (possibleNegativeDiagonalWins < 0 || possiblePositiveDiagonalWins < 0 || possibleVerticalWins < 0 || possibleHorizontalWins < 0)
+	{	winner = "Player2";
+		return winner;
+	}
+
+
+	else if (possibleNegativeDiagonalWins > 0 || possiblePositiveDiagonalWins > 0 || possibleVerticalWins > 0 || possibleHorizontalWins > 0)
+	{	winner = "Player1";
+		return winner;
+	}
+
+	else
+	{	winner = "";
+		return winner;
+	}
+
 
 }
 //-----------------------------------------------------------------------------------------------
@@ -399,14 +437,48 @@ void Board::wouldThereBeAWinner() const
 		int lin = GetTopLineIndexAtColumn();
 		test_board.at(lin).at(col) = "X";
 		//string isThereAWinnerResult= isThereAWinner(test_board);
-
 	}
-
 }
 //-----------------------------------------------------------------------------------------------
-void Board::AIPlay(int selectedColumn) const
-{
-	wouldThereBeAWinner();
+	void Board::AIPlay(int selectedColumn, string AIlevel) const
+	{
+		//wouldThereBeAWinner(); playerSymbol = "O"
+
+		vector < vector <string> > test_board = board;
+		// AI Easy - Places pieces randomly.
+		if (AIlevel == "Computer_Easy")
+		{
+			// AI_move = min + (rand() % (int)(max - min + 1)) / min=0 e max=numC
+			int AI_move = rand() % (int)(numC + 1); //random number between 0 and numC
+
+			test_board.at(topline.at(AI_move)).at(AI_move) = "O";
+			board = test_board; // erro?
+		}
+
+
+		// AI Medium - Plays most of the time randomly, except when the AI can get a win or stop the opponent for winning. 
+		else if (AIlevel == "Computer_Medium")
+		{
+
+			// Insert a piece in every column of the test_board, a copy of the original board.
+
+			for (int i = 0; i < numC; i++)
+			{	test_board.at(topline.at(i)).at(i) = "O";
+				string winner = board.isThereAWinner(test_board);
+				test_board.at(topline.at(i)).at(i) = emptySymbol;
+
+				if (winner == "Player2")
+					board.at(topline.at(i)).at(i) = "O"; break; // erro?
+
+				test_board.at(topline.at(i)).at(i) = "X";
+				string winner = board.isThereAWinner(test_board);
+				test_board.at(topline.at(i)).at(i) = emptySymbol;
+
+				if (winner == "Player1")
+					board.at(topline.at(i)).at(i) = "O"; break; // erro?
+			}
+		}
+
 }
 //-----------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------
@@ -549,7 +621,6 @@ player Menu(player Enemy_player)
 
 			else
 				cout << "Error! You must input 1 , 2 or 3." << endl;
-
 		}
 
 	return Enemy_player;
@@ -604,7 +675,7 @@ void Game()
 {	//Players' Set-Up
 	player player1 = player(1, "X", "Human");
 	player player2 = player(2, "O", "Human");
-	player2 = Menu(player2); //Menu() - asks player game mode, name, etc 
+	player2 = Menu(player2); //Menu() - asks player game mode, level of difficulty
 	player1.InputName(); //asks players' name 
 	player2.InputName();
 
@@ -622,26 +693,60 @@ void Game()
 	int NumberOfPlays = 0;
 	string winnerInfo = {};
 
+	player playerPlaying = player1; //player1 starts
+	string strPlayerPlaying = "player1";
+
 	//Game Start
 	while (true)
 	{
 		string GameResult = "No Winner Yet";
 		board.show(); //shows board with headline directly above and below
-		int PossibleColumnSelected= board.SelectColumn(player1);
-		board.putDiscAtColumn(PossibleColumnSelected);
+		int LastColumnPlayed= board.SelectColumn(playerPlaying); //player chooses column
+		board.putDiscAtColumn(LastColumnPlayed);
 		NumberOfPlays = NumberOfPlays + 1;
 		GameResult = board.isThereAWinner(); //tests if there is a winner
 
 		if (GameResult == "IsWinner")
-			GameEnd(); //game ends
+		{	GameEnd(); //game ends
+			break;
+		}
 
-		else
+		else //when there is no winner yet
 		{
 			string IsThereATie = board.isFull(NumberOfPlays, NumberOfBoardCells);
-			if (IsThereATie == "It's a Tie!")
+
+			if (IsThereATie == "It's a Tie!") //checks for tie
+			{
 				winnerInfo = "Empate, não há vencedor.";
 				GameEnd(player1, player2, winnerInfo); //game ends
+				break;
+			}
+
+			else //if there is no tie, game keeps going: players switch turns
+			{
+				if (strPlayerPlaying == "player1")
+				//if (playerPlaying.GetNumber() == 1)
+				{
+					player1 = playerPlaying; //saves last play
+					playerPlaying = player2; //switches player
+					//strPlayerPlaying = "player2";
+					break;
+				}
+				else if (strPlayerPlaying=="player2")
+				//else if (playerPlaying.GetNumber() == 2)
+				{
+					player2 = playerPlaying; //saves last play
+					playerPlaying = player1; //switches player
+					strPlayerPlaying = "player1";
+					break;
+				}
+				
+			}
+
 		}
+
+
+
 
 	}
 }
