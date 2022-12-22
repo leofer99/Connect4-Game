@@ -1,0 +1,58 @@
+#define RESET   "\033[0m"
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+
+using namespace std;
+
+void player::SetColor(){
+
+char colorX ;
+char colorY;
+cout << "Choose the Color for X (1 - Red, 2 - Green, 3 - Yellow) : ";
+cin >> colorX;
+while ((colorX != 1) || (colorX != 2) || (colorX != 3))
+{
+cout << "You entered the wrong color. Select (1 - Red, 2 - Green, 3 - Yellow)";
+cin >> colorX;
+}
+if (colorX == 1)
+{
+player1.setcolor(getcolor(RED));
+}
+else if(colorX == 2){
+player1.setcolor(getcolor(GREEN))
+}
+else if(colorX == 3){
+player1.setcolor(getcolor(YELLOW))
+}
+
+cout << "Choose the Color for Y (1 - Red, 2 - Green, 3 - Yellow) : ";
+cin >> colorY;
+
+while (colorX == colorY)
+{
+cout << "Please, select a diferent color for Y! \n";
+cin >> colorY;
+}
+
+while ((colorY != 1) || (colorY != 2) || (colorY != 3))
+{
+cout << "You entered the wrong color. Select (1 - Red, 2 - Green, 3 - Yellow)";
+cin >> colorY;
+}
+
+if (colorX == 1)
+{
+player2.setcolor(getcolor(RED));
+}
+else if(colorX == 2){
+player2.setcolor(getcolor(GREEN))
+}
+else if(colorX == 3){
+player1.setcolor(getcolor(YELLOW))
+}
+else {
+  cout << "You entered the wrong color. Select (1 - Red, 2 - Green, 3 - Yellow)";
+}}
+
