@@ -31,6 +31,8 @@ private:
 	string emptySymbol; //flexibilidade do que é considerado espaço vazio no tabuleiro.
 	int numEmptyCells; //(fica - 1 a cada jogada.Ao chegar a zero, declara empate se ninguém tiver dado.)
 	string headline;
+	string winnerSequence1;
+	string winnerSequence2;
 	int NumberOfBoardCells = numC * numL;
 
 	//Guardar linha e coluna da última jogada(procurar se há vencedor, apartir dessa posição)
@@ -55,7 +57,7 @@ public:
 	void putDiscAtColumn(player player, int LastPlayedColumn); //numa determinada coluna
 	bool isFull(int NumberOfPlays, int NumberOfBoardCells) const; //testar se board está cheio
 	void show() const; //mostrar board
-	void isThereAWinner(vector<vector<string>> board) const; //símbolo do vencedor, e linha e coluna da última jogada.
+	void isThereAWinner() const; //símbolo do vencedor, e linha e coluna da última jogada.
 	void wouldThereBeAWinner() const; //putDisc + winner? (p/ AI) 
 	//(pode estar numa classe complementar - Classe Game : encarregar - se de ver conteúdo, verificar vencedor
 	void AIPlay(int selectedColumn) const;
@@ -67,7 +69,11 @@ Board::Board(int numL, int numC, char emptySymbol, int winnersequencelength)
 	this->numL = numL;
 	this->numC = numC;
 	this->emptySymbol = emptySymbol;
-	this->topline = vector<int>(numC, numL - 1);
+	string winnerSequence1(numN, 'X');
+	string winnerSequence2(numN, 'O');
+	this->winnerSequence1 = winnerSequence1;
+	this->winnerSequence2 = winnerSequence2;
+	this->topline= vector<int>(numC, numL - 1);
 	this->board = vector <vector<string>>(numL, vector<string>(numC, emptySymbol));
 }
 //--------------------------------------------------------------------------------------
@@ -153,16 +159,16 @@ string Board::GetEmptySymbol() const
 	return this->emptySymbol;
 }
 //----------------------------------------------------------------------------------------------------
-int Board::GetTopLineIndexAtColumn() const
+int Board::GetTopLineIndexAtColumn( ) const
 { /* Function used to find the line where the disc will be placed.
-At the start of the game, topline has numC elements equal to numL-1. Every time a disc is inserted,
+At the start of the game, topline has numC elements equal to numL-1. Every time a disc is inserted, 
 the value saved for that corresponding column decreases by 1. Hence, if we play in the same column again, we will play in a line higher by 1,
-When the value is 0, it will play at the top of the column. When the value is -1, the column is full.
+When the value is 0, it will play at the top of the column. When the value is -1, the column is full. 
 */
 
-// after every play: 
-
-	topline.at(PossibleColumnSelected) = ColumnHeight + 1;
+	// after every play: 
+	
+		topline.at(PossibleColumnSelected)= ColumnHeight+1;
 
 	// 
 	//return  ;
@@ -196,7 +202,7 @@ int Board::SelectColumn(player player) const
 
 			if (PossibleColumnSelected == Not_found) // garante que o inputed_column averiguado encontra-se na headline
 				cout << "\nError! You must insert a valid input." << endl;
-
+			
 			else //if the value is valid
 			{
 				int ColumnHeight = topline.at(PossibleColumnSelected);
@@ -212,16 +218,16 @@ int Board::SelectColumn(player player) const
 		PossibleColumnSelected = AI_selectedColumn;
 
 	int LastColumnPlayed = PossibleColumnSelected;
-
+	
 	return LastColumnPlayed;
 }
 //-----------------------------------------------------------------------------------------------
 void Board::putDiscAtColumn(player player, int LastColumnPlayed)
 {	//works for both AI and Player
 
-	this->LastColumnPlayed = LastColumnPlayed;
-	this->LastLinePlayed = GetTopLineIndexAtColumn();
-	this->LastDiscSymbol = player.GetSymbol();
+	this->LastColumnPlayed= LastColumnPlayed;
+	this->LastLinePlayed= GetTopLineIndexAtColumn();
+	this->LastDiscSymbol= player.GetSymbol();
 
 	board.at(LastLinePlayed).at(LastColumnPlayed) = LastDiscSymbol;
 }
@@ -231,7 +237,7 @@ string Board::isFull(int NumberOfPlays, int NumberOfBoardCells) const
 	string isThereATie = "There is no tie";
 
 	if (NumberOfPlays == NumberOfBoardCells)
-		isFull = true;
+		isFull = true; 
 
 	//ends game
 	//else, continues game
@@ -277,14 +283,12 @@ string Board::isThereAWinner(vector<vector<string>> board) const
 	string lineWin = "";
 	for (int lin = 0; lin < GetNumLines() - 1; lin++)
 
-		//vector< vector <string> > poard; //?????????????
-
+	//vector< vector <string> > poard; //?????????????
 	//vector< int> possibleHorizontalWins;
 	//possibleHorizontalWins = vector <int>(numL, 0);
 	//vector<int> possibleVerticalWins = vector <int>(numC, 0);
 
-
-		int HighestDimension;
+	int HighestDimension;
 	int LowestDimension;
 	int possibleHorizontalWins = 0;
 	int possibleVerticalWins = 0;
@@ -300,8 +304,6 @@ string Board::isThereAWinner(vector<vector<string>> board) const
 	// Iterator for each vector inside the 2-D vector
 	vector<string>::const_iterator horizontal_it;
 
-	string winnerSequence1 = "XXXX";
-	string winnerSequence2 = "OOOO";
 	//horizontal_it = board[lin].begin();
 
 		// Vitória horizontal
@@ -390,8 +392,7 @@ string Board::isThereAWinner(vector<vector<string>> board) const
 			for (int i = 0; i < HighestDimension; i++)
 			{
 				if ((lin + i < numL) && (col - i >= 0))
-				{
-					NegativeDiagonalWin = NegativeDiagonalWin + board.at(lin + i).at(col - i);
+				{	NegativeDiagonalWin = NegativeDiagonalWin + board.at(lin + i).at(col - i);
 				}
 				else
 					break;
@@ -410,21 +411,18 @@ string Board::isThereAWinner(vector<vector<string>> board) const
 	string winner = "";
 
 	if (possibleNegativeDiagonalWins < 0 || possiblePositiveDiagonalWins < 0 || possibleVerticalWins < 0 || possibleHorizontalWins < 0)
-	{
-		winner = "Player2";
+	{	winner = "Player2";
 		return winner;
 	}
 
 
 	else if (possibleNegativeDiagonalWins > 0 || possiblePositiveDiagonalWins > 0 || possibleVerticalWins > 0 || possibleHorizontalWins > 0)
-	{
-		winner = "Player1";
+	{	winner = "Player1";
 		return winner;
 	}
 
 	else
-	{
-		winner = "";
+	{	winner = "";
 		return winner;
 	}
 
@@ -444,57 +442,44 @@ void Board::wouldThereBeAWinner() const
 	}
 }
 //-----------------------------------------------------------------------------------------------
-void Board::AIPlay(int selectedColumn, string AIlevel) const
-{
-	//wouldThereBeAWinner(); playerSymbol = "O"
-
-	vector < vector <string> > test_board = board;
-	// AI Easy - Places pieces randomly.
-	if (AIlevel == "Computer_Easy")
+	void Board::AIPlay(int selectedColumn, string AIlevel) const
 	{
-		// AI_move = min + (rand() % (int)(max - min + 1)) / min=0 e max=numC
-		int AI_move = rand() % (int)(numC + 1); //random number between 0 and numC
+		//wouldThereBeAWinner(); playerSymbol = "O"
 
-		test_board.at(topline.at(AI_move)).at(AI_move) = "O";
-		board = test_board; // erro?
-	}
-
-
-	// AI Medium - Plays most of the time randomly, except when the AI can get a win or stop the opponent for winning. 
-	else if (AIlevel == "Computer_Medium")
-	{
-		bool change = false;
-		// Insert a piece in every column of the test_board, a copy of the original board.
-
-		for (int i = 0; i < numC; i++)
+		vector < vector <string> > test_board = board;
+		// AI Easy - Places pieces randomly.
+		if (AIlevel == "Computer_Easy")
 		{
-			test_board.at(topline.at(i)).at(i) = "O";
-			string winner = board.isThereAWinner(test_board);
-			test_board.at(topline.at(i)).at(i) = emptySymbol;
-
-			if (winner == "Player2")
-				board.at(topline.at(i)).at(i) = "O"; change = true; break; // erro?
-
-			test_board.at(topline.at(i)).at(i) = "X";
-			string winner = board.isThereAWinner(test_board);
-			test_board.at(topline.at(i)).at(i) = emptySymbol;
-
-			if (winner == "Player1")
-				board.at(topline.at(i)).at(i) = "O"; change = true; break; // erro?
-
-
-		}
-
-		if (change == false)
-		{
+			// AI_move = min + (rand() % (int)(max - min + 1)) / min=0 e max=numC
 			int AI_move = rand() % (int)(numC + 1); //random number between 0 and numC
 
 			test_board.at(topline.at(AI_move)).at(AI_move) = "O";
 			board = test_board; // erro?
-
 		}
-			
-	}
+
+
+		// AI Medium - Plays most of the time randomly, except when the AI can get a win or stop the opponent for winning. 
+		else if (AIlevel == "Computer_Medium")
+		{
+
+			// Insert a piece in every column of the test_board, a copy of the original board.
+
+			for (int i = 0; i < numC; i++)
+			{	test_board.at(topline.at(i)).at(i) = "O";
+				string winner = board.isThereAWinner(test_board);
+				test_board.at(topline.at(i)).at(i) = emptySymbol;
+
+				if (winner == "Player2")
+					board.at(topline.at(i)).at(i) = "O"; break; // erro?
+
+				test_board.at(topline.at(i)).at(i) = "X";
+				string winner = board.isThereAWinner(test_board);
+				test_board.at(topline.at(i)).at(i) = emptySymbol;
+
+				if (winner == "Player1")
+					board.at(topline.at(i)).at(i) = "O"; break; // erro?
+			}
+		}
 
 }
 //-----------------------------------------------------------------------------------------------
@@ -700,6 +685,9 @@ void Game()
 	int numL = SetNumLines(); //user chooses board size
 	int numC = SetNumColumns();
 	int numN = SetConditionsForWinner(); //user chooses winner length sequence
+
+	string winnerSequence1(numN, 'X');
+	string winnerSequence2(numN, 'O');
 	string emptySymbol = ".";
 
 	Board board = Board(numL, numC, emptySymbol, numN);
@@ -709,23 +697,20 @@ void Game()
 	int NumberOfBoardCells = numL * numC;
 	int NumberOfPlays = 0;
 	string winnerInfo = {};
-
+	string GameResult = "No Winner Yet";
 	player playerPlaying = player1; //player1 starts
 	string strPlayerPlaying = "player1";
 
 	//Game Start
 	while (true)
-	{
-		string GameResult = "No Winner Yet";
-		board.show(); //shows board with headline directly above and below
-		int LastColumnPlayed = board.SelectColumn(playerPlaying); //player chooses column
+	{	board.show(); //shows board with headline directly above and below
+		int LastColumnPlayed= board.SelectColumn(playerPlaying); //player chooses column
 		board.putDiscAtColumn(LastColumnPlayed);
 		NumberOfPlays = NumberOfPlays + 1;
-		GameResult = board.isThereAWinner(); //tests if there is a winner
+		GameResult= board.isThereAWinner(); //tests if there is a winner
 
 		if (GameResult == "IsWinner")
-		{
-			GameEnd(); //game ends
+		{	GameEnd(); //game ends
 			break;
 		}
 
@@ -743,29 +728,23 @@ void Game()
 			else //if there is no tie, game keeps going: players switch turns
 			{
 				if (strPlayerPlaying == "player1")
-					//if (playerPlaying.GetNumber() == 1)
+				//if (playerPlaying.GetNumber() == 1)
 				{
 					player1 = playerPlaying; //saves last play
 					playerPlaying = player2; //switches player
 					//strPlayerPlaying = "player2";
 					break;
 				}
-				else if (strPlayerPlaying == "player2")
-					//else if (playerPlaying.GetNumber() == 2)
+				else if (strPlayerPlaying=="player2")
+				//else if (playerPlaying.GetNumber() == 2)
 				{
 					player2 = playerPlaying; //saves last play
 					playerPlaying = player1; //switches player
 					strPlayerPlaying = "player1";
 					break;
-				}
-
+				}	
 			}
-
 		}
-
-
-
-
 	}
 }
 //-----------------------------------------------------------------------------------------------
