@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <fstream> // allows to read and write .txt files
 #include <cmath>
@@ -185,6 +186,8 @@ private:
 	string winnerSequence1;
 	string winnerSequence2;
 	int NumberOfBoardCells = numC * numL;
+	int HighestDimension = max(numC, numL);
+	int LowestDimension = min(numL, numC);
 
 	//Guardar linha e coluna da última jogada(procurar se há vencedor, apartir dessa posição)
 	string LastDiscSymbol;
@@ -209,12 +212,12 @@ public:
 	void putDiscAtColumn(player player); //numa determinada coluna
 	string isFull(int NumberOfPlays, int NumberOfBoardCells) const; //testar se board está cheio
 	void show() const; //mostrar board
-	string isThereAWinner() const; //símbolo do vencedor, e linha e coluna da última jogada.
+	string isThereAWinner(); //símbolo do vencedor, e linha e coluna da última jogada.
 	void wouldThereBeAWinner(); //putDisc + winner? (p/ AI) 
 	//(pode estar numa classe complementar - Classe Game : encarregar - se de ver conteúdo, verificar vencedor
 	void AIPlay(int selectedColumn, string AIlevel);
 
-	
+
 };
 //--------------------------------------------------------------------------------------
 Board::Board(int numL, int numC, string emptySymbol, int winnersequencelength)
@@ -382,14 +385,12 @@ void Board::show() const
 }
 //-----------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------
-string Board::isThereAWinner() const
+string Board::isThereAWinner() 
 {
 	//checking for horizontal win:
 	string lineWin = "";
-	for (int lin = 0; lin < GetNumLines() - 1; lin++)
+	//for (int lin = 0; lin < GetNumLines() - 1; lin++)
 
-	int HighestDimension;
-	int LowestDimension;
 	int possibleHorizontalWins = 0;
 	int possibleVerticalWins = 0;
 	int possibleNegativeDiagonalWins = 0; // (\)
@@ -411,6 +412,7 @@ string Board::isThereAWinner() const
 	{
 		for (horizontal_it = board[lin].begin(); horizontal_it != board[lin].end(); horizontal_it++)
 		{
+			HighestDimension = 1;
 			linWin = linWin + *horizontal_it;
 			if (linWin.find(winnerSequence1) == NotFoundInStr)
 				possibleHorizontalWins += 0;
@@ -456,8 +458,6 @@ string Board::isThereAWinner() const
 
 	//PositiveDiagonalWin PossiblePositiveDiagonalWin
 	// Vitória diagonalLeftToRight (/)
-	int HighestDimension = max(numC, numL);
-	int LowestDimension = min(numL, numC);
 
 	for (int col = 0; col < numC; col++)
 	{
@@ -532,7 +532,7 @@ string Board::isThereAWinner() const
 }
 //-----------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------
-void Board::wouldThereBeAWinner() 
+void Board::wouldThereBeAWinner()
 {
 	vector < vector <string> > test_board = board;
 
@@ -544,7 +544,7 @@ void Board::wouldThereBeAWinner()
 	}
 }
 //-----------------------------------------------------------------------------------------------
-void Board::AIPlay(int selectedColumn, string AIlevel) 
+void Board::AIPlay(int selectedColumn, string AIlevel)
 {
 	//wouldThereBeAWinner(); playerSymbol = "O"
 
@@ -582,14 +582,14 @@ void Board::AIPlay(int selectedColumn, string AIlevel)
 		for (int i = 0; i < numC; i++)
 		{
 			test_board.board.at(topline.at(i)).at(i) = "O";
-			string winner = test_board.isThereAWinner();
+			winner = test_board.isThereAWinner();
 			test_board.board.at(topline.at(i)).at(i) = emptySymbol;
 
 			if (winner == "Player2")
 				board.at(topline.at(i)).at(i) = "O"; break; // erro?
 
 			test_board.board.at(topline.at(i)).at(i) = "X";
-			string winner = test_board.isThereAWinner();
+			winner = test_board.isThereAWinner();
 			test_board.board.at(topline.at(i)).at(i) = emptySymbol;
 
 			if (winner == "Player1")
@@ -645,6 +645,43 @@ int SetConditionsForWinner(int numL, int numC)
 			cout << "Invalid Condition!! \n";
 		}
 	}
+}
+//-----------------------------------------------------------------------------------------------
+void GameEnd(player player1, player player2, string winnerInfo)
+{
+	string ctrlz;
+	if (ctrlz == "Not Pressed")
+	{
+		//if CTRL-Z is activated, nothing is registered in the file.
+		//if it is not activated/pressed, data is registered in the file
+
+		ofstream file;
+		file.open("winner.txt");// Creates the file 
+
+		// Writes the winner and the time in file in following format: 2022-10-15 / 09:05 – 1)computador vs 2)Pedro Costa – vencedor: 2.
+		file << time();
+		file << " - 1)" << player1.GetName() << " vs 2)" << player2.GetName() << " - vencedor: " << winnerInfo << "\n";
+		file.close(); // Close file
+
+		cout << "Saving to the file..." << endl;
+		unsigned sleep(2); //Sleep the system for 2s 
+		cout << "Thanks for playing, bye :) !! " << endl;
+
+	}
+}
+//-----------------------------------------------------------------------------------------------
+char time()
+{
+	time_t t;
+	struct tm* infoTime;
+	char DayTime[20]; //Where the time information will be saved.
+
+	time(&t);
+	infoTime = localtime(&t); //Get the time 
+
+	strftime(DayTime, 20, "%F / %R", infoTime); //Creates the Day and Time with the following format YYYY/MM/DD / HH:MM
+
+	return DayTime[20];
 }
 //-----------------------------------------------------------------------------------------------
 void Game()
@@ -722,42 +759,6 @@ void Game()
 	}
 }
 //-----------------------------------------------------------------------------------------------
-char time()
-{
-	time_t t;
-	struct tm* infoTime;
-	char DayTime[20]; //Where the time information will be saved.
-
-	time(&t);
-	infoTime = localtime(&t); //Get the time 
-
-	strftime(DayTime, 20, "%F / %R", infoTime); //Creates the Day and Time with the following format YYYY/MM/DD / HH:MM
-
-	return DayTime[20];
-}
-//-----------------------------------------------------------------------------------------------
-void GameEnd(player player1, player player2, string winnerInfo)
-{
-	string ctrlz;
-	if (ctrlz == "Not Pressed")
-	{
-		//if CTRL-Z is activated, nothing is registered in the file.
-		//if it is not activated/pressed, data is registered in the file
-
-		ofstream file;
-		file.open("winner.txt");// Creates the file 
-
-		// Writes the winner and the time in file in following format: 2022-10-15 / 09:05 – 1)computador vs 2)Pedro Costa – vencedor: 2.
-		file << time();
-		file << " - 1)" << player1.GetName() << " vs 2)" << player2.GetName() << " - vencedor: " << winnerInfo << "\n";
-		file.close(); // Close file
-
-		cout << "Saving to the file..." << endl;
-		unsigned sleep(2); //Sleep the system for 2s 
-		cout << "Thanks for playing, bye :) !! " << endl;
-
-	}
-}
 //-----------------------------------------------------------------------------------------------
 int main()
 {
