@@ -761,10 +761,12 @@ void Game()
 		NumberOfPlays = NumberOfPlays + 1;
 		board.show();
 		GameResult = board.isThereAWinner(); //tests if there is a winner
-		cout << "GameResult:" << GameResult;
+		//cout << "GameResult:" << GameResult;
 
 		if (GameResult == "IsWinner")
 		{
+			winnerInfo = strPlayerPlaying;
+			cout << "Test- Is Winner";
 			GameEnd(player1, player2, winnerInfo); //game ends
 			break;
 		}
