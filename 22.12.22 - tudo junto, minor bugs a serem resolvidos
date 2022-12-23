@@ -208,7 +208,7 @@ public:
 	void Headline();
 	int	GetTopLineIndexAtColumn();
 	//int SetTopLine() const;
-	int SelectColumn(player player) const;
+	int SelectColumn(player player);
 	void putDiscAtColumn(player player); //numa determinada coluna
 	string isFull(int NumberOfPlays, int NumberOfBoardCells) const; //testar se board está cheio
 	void show() const; //mostrar board
@@ -281,13 +281,13 @@ When the value is 0, it will play at the top of the column. When the value is -1
 // after every play: 
 	int ColumnHeight = topline.at(LastColumnPlayed);
 	this->LastLinePlayed = ColumnHeight - 1;
-	cout << "LastLine Played (dentro TopLine):" << LastLinePlayed;
+	cout << "LastLine Played (dentro TopLine): " << LastLinePlayed;
 	topline.at(LastColumnPlayed) = this->LastLinePlayed;
 	return this->LastLinePlayed;
 }
 
 //-----------------------------------------------------------------------------------------------
-int Board::SelectColumn(player player) const
+int Board::SelectColumn(player player) 
 {
 	string InputedColumn = "";
 	string PlayerName = player.GetName();
@@ -303,8 +303,6 @@ int Board::SelectColumn(player player) const
 			cout << "\n" << PlayerName << ", in which column, do you want to insert your piece?" << endl;
 			cin >> InputedColumn;
 
-			//InputedColumn = "a";
-
 			if ((InputedColumn.size() != 1) ) // garante que o input é somente uma letra
 				InputedColumn = "_"; //in this case, it will not detect the value in the headline and will output an error
 				
@@ -315,9 +313,8 @@ int Board::SelectColumn(player player) const
 
 			PossibleColumnSelected = int(headline.find(InputedColumn[0]));
 			PossibleColumnSelected = PossibleColumnSelected; 
-			/*cout << "Valor:" << InputedColumn[0];
+			cout << "Valor:" << InputedColumn[0];
 			cout << "Coluna a que corresponde: (-1 se não for a nenhuma) " << int(headline.find(InputedColumn[0]));
-			*/
 
 			if (PossibleColumnSelected == Not_found) // garante que o inputed_column averiguado se encontra na headline
 				cout << "\nError! You must insert a valid input." << endl;
@@ -337,22 +334,21 @@ int Board::SelectColumn(player player) const
 		PossibleColumnSelected = AI_selectedColumn;
 
 	int LastColumnPlayed = PossibleColumnSelected;
-	//cout << IsColumnValid;
+	this->LastColumnPlayed = LastColumnPlayed;
+	cout << "LastCol:" << LastColumnPlayed;
 	return LastColumnPlayed;
 }
 //-----------------------------------------------------------------------------------------------
 void Board::putDiscAtColumn(player player)
 {	//works for both AI and Player
 
-	this->LastColumnPlayed = LastColumnPlayed;
 	this->LastLinePlayed = GetTopLineIndexAtColumn();
-	cout << "LastCol Played:" << LastColumnPlayed;
-	cout << "LastLine Played:" << LastLinePlayed;
+	/*cout << "LastCol Played:" << LastColumnPlayed;
+	cout << "LastLine Played:" << LastLinePlayed;*/
 
 	this->LastDiscSymbol = player.GetSymbol();
 	board.at(LastLinePlayed).at(LastColumnPlayed) = LastDiscSymbol;
 	
-	cout << "Has put the disc";
 }
 //-----------------------------------------------------------------------------------------------
 string Board::isFull(int NumberOfPlays, int NumberOfBoardCells) const
@@ -395,15 +391,6 @@ void Board::show() const
 			cout << " " << *it2 << " ";
 		cout << endl;
 	}
-
-	//for (int col = 0; col < numC; col++) //outputs board
-	//	for (int lin = 0; lin < numL; lin++)
-	//	{
-	//		if (col == numC - 1) //if it's a value in the last column, goes to the next line
-	//			cout << ' ' << board.at(col).at(lin) << endl;
-	//		else
-	//			cout << ' ' << board.at(col).at(lin) << ' ';
-	//	}
 
 	cout << headline_displayed << endl;;
 
@@ -630,11 +617,20 @@ Start of Functions to help play the game*/
 //-----------------------------------------------------------------------------------------------
 int SetNumLines()
 {
+
 	int numL = 0;
+	string numLStr = "";
 	while (numL < 6 || numL > 10)
 	{
 		cout << "Please, set the dimensions of the board (Minimum dimension: 6x6, Maximum dimension: 10x10). Number of Lines: ";
-		cin >> numL;
+		cin >> numLStr;
+
+		bool isInt = (numLStr.find_first_not_of("0123456789") == std::string::npos);
+
+
+		if (isInt == true)
+			numL = stoi(numLStr);
+
 		if (numL < 6 || numL > 10)
 		{
 			cout << "Invalid Number of Lines, must be between 6 and 10!! \n";
@@ -645,35 +641,51 @@ int SetNumLines()
 //-----------------------------------------------------------------------------------------------
 int SetNumColumns()
 {
-	int numC=0;
-	while (numC < 6 || numC > 10)
-	{
-		cout << "Number of Columns: ";
-		cin >> numC;
-		if (numC < 6 || numC > 10)
+		int numC = 0;
+		string numCStr = "";
+		while (numC < 6 || numC > 10)
 		{
-			cout << "Invalid Number of Columns, must be between 6 and 10!! \n";
+			cout << "Number of Columns: ";
+			cin >> numCStr;
+
+			bool isInt = (numCStr.find_first_not_of("0123456789") == std::string::npos);
+
+
+			if (isInt == true)
+				numC = stoi(numCStr);
+
+
+			if (numC < 6 || numC > 10)
+			{
+				cout << "Invalid Number of Columns, must be between 6 and 10!! \n";
+			}
 		}
-	}
-	return numC;
+		return numC;
 }
 //-----------------------------------------------------------------------------------------------
-int SetConditionsForWinner(int numL, int numC)
-{
-	int numN=0;
-
-	while (numN < 4 || numN> max(numC, numL))
+	int SetConditionsForWinner(int numL, int numC)
 	{
-		cout << "Please, choose how many consecutive symbols are needed to win (Minimun = 4):  ";
-		cin >> numN;
+		int numN = 0;
+		string numNStr = "";
 
-		if (numN < 4 || numN> max(numC, numL))
+		while (numN < 4 || numN> max(numC, numL))
 		{
-			cout << "Invalid Condition!! \n";
+			cout << "Please, choose how many consecutive symbols are needed to win (Minimun = 4):  ";
+			cin >> numNStr;
+
+			bool isInt = (numNStr.find_first_not_of("0123456789") == std::string::npos);
+
+
+			if (isInt == true)
+				numN = stoi(numNStr);
+
+			if (numN < 4 || numN> max(numC, numL))
+			{
+				cout << "Invalid Condition!! \n";
+			}
 		}
+		return numN;
 	}
-	return numN;
-}
 //-----------------------------------------------------------------------------------------------
 char time()
 {
@@ -744,6 +756,7 @@ void Game()
 	{
 		board.show(); //shows board with headline directly above and below
 		int LastColumnPlayed = board.SelectColumn(playerPlaying); //player chooses column
+		cout << "Last Col Play in Gmae()" << LastColumnPlayed;
 		board.putDiscAtColumn(playerPlaying);
 		NumberOfPlays = NumberOfPlays + 1;
 		board.show();
