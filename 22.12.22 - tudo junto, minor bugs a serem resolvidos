@@ -544,23 +544,30 @@ void Board::wouldThereBeAWinner()
 	}
 }
 //-----------------------------------------------------------------------------------------------
-void Board::AIPlay(int selectedColumn, string AIlevel)
+void Board::AIPlay(int selectedColumn, string AIlevel, int winnerSequenceLength) const
 {
 	//wouldThereBeAWinner(); playerSymbol = "O"
-
-	//vector < vector <string> > test_board = board;
-	Board test_board = Board(numL, numC, emptySymbol, numN);
-
 	int HighestDimension = max(numC, numL);
+
 	double counting_points = 0;
 	double counting_symbols = 0;
+
+	
+
 	string winner = ""; // "Player1", "Player2" or "".
+
+	vector < vector <string> > test_board = board;
+	vector < vector <string> > test_board_possible_human_play = board;
+
 	int NotFoundInStr = string::npos;
 
 	string ComputerSymbol = "O";
 	string HumanSymbol = "X";
 	string emptySymbolStr = "";
+
+
 	bool change = false;
+
 
 
 	// AI Easy - Places pieces randomly.
@@ -569,35 +576,457 @@ void Board::AIPlay(int selectedColumn, string AIlevel)
 		// AI_move = min + (rand() % (int)(max - min + 1)) / min=0 e max=numC
 		int AI_move = rand() % (int)(numC + 1); //random number between 0 and numC
 
-		test_board.board.at(topline.at(AI_move)).at(AI_move) = "O";
-		//string symbol= "O";
-		test_board.board.at(topline.at(AI_move)).at(AI_move) = "O";
-		board = test_board.board; // erro?
+		test_board.at(topline.at(AI_move)).at(AI_move) = ComputerSymbol;
+		board = test_board; // erro?
 	}
+
 
 	// AI Medium - Plays most of the time randomly, except when the AI can get a win or stop the opponent for winning. 
 	else if (AIlevel == "Computer_Medium")
 	{
+		change = false;
 		// Insert a piece in every column of the test_board, a copy of the original board.
+
 		for (int i = 0; i < numC; i++)
 		{
-			test_board.board.at(topline.at(i)).at(i) = "O";
-			winner = test_board.isThereAWinner();
-			test_board.board.at(topline.at(i)).at(i) = emptySymbol;
+			test_board.at(topline.at(i)).at(i) = ComputerSymbol;
+			winner = board.isThereAWinner(test_board);
+			test_board.at(topline.at(i)).at(i) = emptySymbol;
 
 			if (winner == "Player2")
-				board.at(topline.at(i)).at(i) = "O"; break; // erro?
+				board.at(topline.at(i)).at(i) = ComputerSymbol; change = true; break; // erro?
 
-			test_board.board.at(topline.at(i)).at(i) = "X";
-			winner = test_board.isThereAWinner();
-			test_board.board.at(topline.at(i)).at(i) = emptySymbol;
+			test_board.at(topline.at(i)).at(i) = HumanSymbol;
+			winner = board.isThereAWinner(test_board);
+			test_board.at(topline.at(i)).at(i) = emptySymbol;
 
 			if (winner == "Player1")
-				board.at(topline.at(i)).at(i) = "O"; break; // erro?
+				board.at(topline.at(i)).at(i) = ComputerSymbol; change = true; break; // erro?
+
+
 		}
+
+		if (change == false)
+		{
+			int AI_move = rand() % (int)(numC + 1); //random number between 0 and numC
+
+			test_board.at(topline.at(AI_move)).at(AI_move) = ComputerSymbol;
+			board = test_board; // erro?
+
+		}
+
+
+		// AI Hard - Plays most of the time randomly, except when the AI can get a win or stop the opponent for winning. 
+		else if (AIlevel == "Computer_Hard")
+		{
+			
+			
+			
+			
+			change = false;
+
+			for (int i = 0; i < numC; i++)
+			{
+				test_board.at(topline.at(i)).at(i) = ComputerSymbol;
+				string winner = board.isThereAWinner(test_board);
+				test_board.at(topline.at(i)).at(i) = emptySymbol;
+
+				if (winner == "Player2")
+					board.at(topline.at(i)).at(i) = ComputerSymbol; change = true; break;
+
+				test_board.at(topline.at(i)).at(i) = "X";
+				string winner = board.isThereAWinner(test_board);
+				test_board.at(topline.at(i)).at(i) = emptySymbol;
+
+				if (winner == "Player1")
+					board.at(topline.at(i)).at(i) = "O"; change = true; break;
+
+
+			}
+
+			if (change == false)
+			{
+
+				for (int i = 0; i < winnerSequenceLength; i++)
+					emptySymbolStr = emptySymbolStr + emptySymbol;
+
+				string combination_human = emptySymbolStr;
+				string combination_computer = emptySymbolStr;
+
+
+				vector<string> all_combinations_computer{};
+				vector<string> all_combinations_human{};
+
+
+				int counter = 1;
+				while (counter <= winnerSequenceLength)
+				{
+					for (int i = 0; i < counter; i++)
+					{
+						combination_computer.at(i) = ComputerSymbol[0];
+						combination_human.at(i) = HumanSymbol[0];
+					}
+
+					all_combinations_computer.push_back(combination_computer);
+					all_combinations_human.push_back(combination_human);
+
+					for (int j = 0; j + counter < winnerSequenceLength; j++)
+					{
+						combination_computer.at(j + counter) = ComputerSymbol[0];
+						combination_computer.at(j) = emptySymbol[0];
+
+						combination_human.at(j + counter) = HumanSymbol[0];
+						combination_human.at(j) = emptySymbol[0];
+
+						all_combinations_computer.push_back(combination_computer);
+						all_combinations_human.push_back(combination_human);
+
+
+					} //XXXXX. .XXXXX
+
+					combination_human = emptySymbolStr;
+					combination_computer = emptySymbolStr;
+
+					counter++;
+				}
+
+				reverse(all_combinations_computer.begin(), all_combinations_computer.end());
+
+				reverse(all_combinations_human.begin(), all_combinations_human.end());
+
+
+				//vector <string> combinations = ;
+
+				// if winnerSequenceLength == 6;
+				// XX.... | .XX... | ..XX..  | ...XX. | ....XX
+				// XXX... | .XXX.. | ..XXX.  | ...XXX
+				// XXXX.. | .XXXX. | ..XXXX
+				// XXXXX. | .XXXX
+
+				//string verticalStrWithoutExtraPiece = "";
+				string verticalStr = "";
+				string verticalPossibleHumanPlayStr = "";
+
+				//string horizontalStrWithoutExtraPiece = "";
+				string horizontalStr = "";
+				string horizontalPossibleHumanPlayStr = "";
+
+				//string positiveDiagonalStrWithoutExtraPiece = ""; // (/)
+				string positiveDiagonalStr = ""; // (/)
+				string positiveDiagonalForwardStr = "";
+				string positiveDiagonalBackwardStr = "";
+
+				string positiveDiagonalPossibleHumanPlayStr = ""; // (/)
+				string positiveDiagonalForwardPossibleHumanPlayStr = "";
+				string positiveDiagonalBackwardPossibleHumanPlayStr = "";
+
+				//string negativeDiagonalStrWithoutExtraPiece = ""; // (\)
+				string negativeDiagonalStr = ""; // (\)
+				string negativeDiagonalForwardStr = "";
+				string negativeDiagonalBackwardStr = "";
+
+				string negativeDiagonalPossibleHumanPlayStr = ""; // (\)
+				string negativeDiagonalForwardPossibleHumanPlayStr = "";
+				string negativeDiagonalBackwardPossibleHumanPlayStr = "";
+
+				vector <double> points = vector <double>(numC, 0);
+
+
+
+				//VerticalSTR
+				for (int col = 0; col < numC; col++)
+				{
+
+					if (topline.at(col) != -1) // -1 -> column full
+					{
+						test_board.at(topline.at(col)).at(col) = ComputerSymbol;
+						test_board_possible_human_play.at(topline.at(col)).at(col) = HumanSymbol;
+
+						for (int lin = 0; lin < numL; lin++)
+						{
+							verticalStr = verticalStr + test_board.at(lin).at(col);
+							verticalPossibleHumanPlayStr = verticalPossibleHumanPlayStr + test_board_possible_human_play.at(lin).at(col);
+
+						}
+
+
+
+						for (int i = 0; i < all_combinations_computer.size(); i++)
+						{
+
+							if (verticalStr.find(all_combinations_computer.at(i)) != NotFoundInStr)
+							{
+								counting_points = count(verticalStr.begin(), verticalStr.end(), all_combinations_computer.at(i));
+								counting_symbols = count(all_combinations_computer.at(i).begin(), all_combinations_computer.at(i).end(), ComputerSymbol);
+								if (counting_symbols == winnerSequenceLength)
+									counting_symbols = 9000;
+
+								points[col] += counting_points * counting_symbols;
+
+							}
+
+							if (verticalStr.find(all_combinations_human.at(i)) != NotFoundInStr)
+							{
+								counting_points = count(verticalPossibleHumanPlayStr.begin(), verticalPossibleHumanPlayStr.end(), all_combinations_human.at(i));
+								counting_symbols = count(all_combinations_human.at(i).begin(), all_combinations_human.at(i).end(), HumanSymbol);
+								if (counting_symbols == winnerSequenceLength)
+									counting_symbols += 100;
+
+								points[col] += (counting_points*0.66) * counting_symbols; // incentiva o computador a interromper jogadas do adversário.
+
+							}
+
+						}
+						verticalStr = "";
+						test_board.at(topline.at(col)).at(col) = emptySymbol;
+						test_board_possible_human_play.at(topline.at(col)).at(col) = emptySymbol;
+
+					}
+
+					else
+						points[col] = -1000;
+
+				}
+
+
+				//HorizontalSTR
+				for (int col = 0; col < numC; col++)
+				{
+
+					if (topline.at(col) != -1) // -1 -> column full
+					{
+						test_board.at(topline.at(col)).at(col) = ComputerSymbol;
+						test_board_possible_human_play.at(topline.at(col)).at(col) = HumanSymbol;
+						
+
+
+						for (int col1 = 0; col1 < numC; col1++)
+						{
+							
+							horizontalStr = horizontalStr + test_board.at(topline.at(col)).at(col1);
+							horizontalPossibleHumanPlayStr = horizontalPossibleHumanPlayStr + test_board_possible_human_play.at(topline.at(col)).at(col1);
+						}
+
+
+
+						for (int i = 0; i < all_combinations_computer.size(); i++)
+						{
+
+							if (horizontalStr.find(all_combinations_computer.at(i)) != NotFoundInStr)
+							{
+								counting_points = count(horizontalStr.begin(), horizontalStr.end(), all_combinations_computer.at(i));
+								counting_symbols = count(all_combinations_computer.at(i).begin(), all_combinations_computer.at(i).end(), ComputerSymbol);
+								if (counting_symbols == winnerSequenceLength)
+									counting_symbols = 9000;
+
+								points[col] += counting_points * counting_symbols;
+							}
+
+							if (horizontalPossibleHumanPlayStr.find(all_combinations_human.at(i)) != NotFoundInStr)
+							{
+								counting_points = count(horizontalPossibleHumanPlayStr.begin(), horizontalPossibleHumanPlayStr.end(), all_combinations_human.at(i));
+								counting_symbols = count(all_combinations_human.at(i).begin(), all_combinations_human.at(i).end(), HumanSymbol);
+								if (counting_symbols == winnerSequenceLength)
+									counting_symbols += 100;
+
+								points[col] += (counting_points * 0.66) * counting_symbols; // incentiva o computador a interromper jogadas do adversário.
+							}
+
+						}
+						horizontalStr = horizontalPossibleHumanPlayStr = "";
+						test_board.at(topline.at(col)).at(col) = emptySymbol;
+						test_board_possible_human_play.at(topline.at(col)).at(col) = emptySymbol;
+
+
+
+					}
+
+					else
+						points[col] = -1000;
+
+				}
+
+
+				//positiveDiagonalStr
+				for (int col = 0; col < numC; col++)
+				{
+
+					if (topline.at(col) != -1) // -1 -> column full
+					{
+						test_board.at(topline.at(col)).at(col) = ComputerSymbol;
+						test_board_possible_human_play.at(topline.at(col)).at(col) = HumanSymbol;
+
+						positiveDiagonalForwardStr = positiveDiagonalForwardStr + test_board.at(topline.at(col)).at(col);
+						positiveDiagonalForwardPossibleHumanPlayStr = positiveDiagonalForwardPossibleHumanPlayStr + test_board_possible_human_play.at(topline.at(col)).at(col);
+
+						for (int i = 1; i < HighestDimension; i++)
+						{
+							if ((col + i < numC) && (topline.at(col) - i > 0))
+							{
+								positiveDiagonalForwardStr = positiveDiagonalForwardStr + test_board.at((topline.at(col) - i)).at(col + i);
+								positiveDiagonalForwardPossibleHumanPlayStr = positiveDiagonalForwardPossibleHumanPlayStr + test_board_possible_human_play.at((topline.at(col) - i)).at(col + i);
+							}
+
+							if ((col - i > 0) && (topline.at(col) + i < numL))
+							{
+								positiveDiagonalBackwardStr = positiveDiagonalBackwardStr + test_board.at((topline.at(col) + i)).at(col - i);
+								positiveDiagonalBackwardPossibleHumanPlayStr = positiveDiagonalBackwardPossibleHumanPlayStr + test_board_possible_human_play.at((topline.at(col) + i)).at(col - i);
+							}
+
+						}
+
+						reverse(positiveDiagonalBackwardStr.begin(), positiveDiagonalBackwardStr.end());
+
+						reverse(positiveDiagonalBackwardPossibleHumanPlayStr.begin(), positiveDiagonalBackwardPossibleHumanPlayStr.end());
+
+						positiveDiagonalStr = positiveDiagonalBackwardStr + positiveDiagonalForwardStr;
+						positiveDiagonalPossibleHumanPlayStr = positiveDiagonalBackwardPossibleHumanPlayStr + positiveDiagonalForwardPossibleHumanPlayStr;
+
+
+
+						for (int i = 0; i < all_combinations_computer.size(); i++)
+						{
+
+							if (positiveDiagonalStr.find(all_combinations_computer.at(i)) != NotFoundInStr)
+							{
+								counting_points = count(positiveDiagonalStr.begin(), positiveDiagonalStr.end(), all_combinations_computer.at(i));
+								counting_symbols = count(all_combinations_computer.at(i).begin(), all_combinations_computer.at(i).end(), ComputerSymbol);
+								if (counting_symbols == winnerSequenceLength)
+									counting_symbols = 1000;
+
+								points[col] += counting_points * counting_symbols;
+
+							}
+
+							if (positiveDiagonalPossibleHumanPlayStr.find(all_combinations_human.at(i)) != NotFoundInStr)
+							{
+								counting_points = count(positiveDiagonalPossibleHumanPlayStr.begin(), positiveDiagonalPossibleHumanPlayStr.end(), all_combinations_computer.at(i));
+								counting_symbols = count(all_combinations_computer.at(i).begin(), all_combinations_computer.at(i).end(), HumanSymbol);
+								if (counting_symbols == winnerSequenceLength)
+									counting_symbols += 100;
+
+								points[col] += (counting_points * 0.66) * counting_symbols; // incentiva o computador a interromper jogadas do adversário.
+
+							}
+
+						}
+						positiveDiagonalStr = positiveDiagonalBackwardStr  = positiveDiagonalForwardStr = "";
+						positiveDiagonalPossibleHumanPlayStr = positiveDiagonalBackwardPossibleHumanPlayStr = positiveDiagonalForwardPossibleHumanPlayStr = "";
+
+						test_board.at(topline.at(col)).at(col) = emptySymbol;
+						test_board_possible_human_play.at(topline.at(col)).at(col) = emptySymbol;
+
+					}
+
+					else
+						points[col] = -1000;
+				}
+
+
+				//negativeDiagonalStr
+				for (int col = 0; col < numC; col++)
+				{
+
+					if (topline.at(col) != -1) // -1 -> column full
+					{
+						test_board.at(topline.at(col)).at(col) = ComputerSymbol;
+						test_board_possible_human_play.at(topline.at(col)).at(col) = HumanSymbol;
+
+						negativeDiagonalForwardStr = negativeDiagonalForwardStr + test_board.at(topline.at(col)).at(col);
+						negativeDiagonalForwardPossibleHumanPlayStr = negativeDiagonalForwardPossibleHumanPlayStr + test_board_possible_human_play.at(topline.at(col)).at(col);
+
+						for (int i = 1; i < HighestDimension; i++)
+						{
+							if ((col - i > 0) && (topline.at(col) - i > 0))
+							{
+								negativeDiagonalForwardStr = negativeDiagonalForwardStr + test_board.at((topline.at(col) - i)).at(col + i);
+								negativeDiagonalForwardPossibleHumanPlayStr = negativeDiagonalForwardPossibleHumanPlayStr + test_board_possible_human_play.at((topline.at(col) - i)).at(col + i);
+							}
+
+							if ((col + i < numC) && (topline.at(col) + i < numL))
+							{
+								negativeDiagonalBackwardStr = negativeDiagonalBackwardStr + test_board.at((topline.at(col) + i)).at(col - i);
+								negativeDiagonalBackwardPossibleHumanPlayStr = negativeDiagonalBackwardPossibleHumanPlayStr + test_board_possible_human_play.at((topline.at(col) + i)).at(col - i);
+							}
+
+						}
+
+						reverse(negativeDiagonalBackwardStr.begin(), negativeDiagonalBackwardStr.end());
+
+						reverse(negativeDiagonalBackwardPossibleHumanPlayStr.begin(), negativeDiagonalBackwardPossibleHumanPlayStr.end());
+
+						negativeDiagonalStr = negativeDiagonalBackwardStr + negativeDiagonalForwardStr;
+						negativeDiagonalPossibleHumanPlayStr = negativeDiagonalBackwardPossibleHumanPlayStr + negativeDiagonalForwardPossibleHumanPlayStr;
+
+
+
+
+						for (int i = 0; i < all_combinations_computer.size(); i++)
+						{
+
+							if (negativeDiagonalStr.find(all_combinations_computer.at(i)) != NotFoundInStr)
+							{
+								counting_points = count(negativeDiagonalStr.begin(), negativeDiagonalStr.end(), all_combinations_computer.at(i));
+								counting_symbols = count(all_combinations_computer.at(i).begin(), all_combinations_computer.at(i).end(), ComputerSymbol);
+								if (counting_symbols == winnerSequenceLength)
+									counting_symbols = 1000;
+
+								points[col] += counting_points * counting_symbols;
+
+							}
+
+							if (negativeDiagonalPossibleHumanPlayStr.find(all_combinations_human.at(i)) != NotFoundInStr)
+							{
+								counting_points = count(negativeDiagonalPossibleHumanPlayStr.begin(), negativeDiagonalPossibleHumanPlayStr.end(), all_combinations_computer.at(i));
+								counting_symbols = count(all_combinations_computer.at(i).begin(), all_combinations_computer.at(i).end(), HumanSymbol);
+								if (counting_symbols == winnerSequenceLength)
+									counting_symbols += 100;
+
+								points[col] += (counting_points * 0.66) * counting_symbols; // incentiva o computador a interromper jogadas do adversário.
+
+							}
+
+						}
+						negativeDiagonalStr = negativeDiagonalBackwardStr = negativeDiagonalForwardStr = "";
+						negativeDiagonalPossibleHumanPlayStr = negativeDiagonalBackwardPossibleHumanPlayStr = negativeDiagonalForwardPossibleHumanPlayStr = "";
+
+						test_board.at(topline.at(col)).at(col) = emptySymbol;
+						test_board_possible_human_play.at(topline.at(col)).at(col) = emptySymbol;
+
+					}
+
+					else
+						points[col] = -1000;
+				}
+
+				
+				int max_index = *max_element(points.rbegin(), points.rend()); // finds the index of the highest value in the vector points
+
+				board.at(topline.at(max_index)).at(max_index) = ComputerSymbol;
+
+
+
+
+
+
+			}
+
+
+
+
+
+
+
+
+
+		}
+
+
 	}
 
 }
+
+
 //-----------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------
 /*End of Class player.
