@@ -52,9 +52,9 @@ player::player(int player_number, string symbol, string player_type)
 	this->name = "";
 
 	if (symbol == "X")
-		this->colour = "red";
+		this->colour = RED;
 	else if (symbol == "O")
-		this->colour = "blue";
+		this->colour = BLUE;
 }
 //----------------------------------------------------------------------------------------------------
 void player::InputName()
