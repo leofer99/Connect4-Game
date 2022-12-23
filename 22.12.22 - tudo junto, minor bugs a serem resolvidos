@@ -704,7 +704,8 @@ void Game()
 
 	Board board = Board(numL, numC, emptySymbol, numN);
 
-	board.SetEmptySymbol(); //user chooses empty symbol
+	//board.SetEmptySymbol(); //user chooses empty symbol - está estranho!
+
 
 	int NumberOfBoardCells = numL * numC;
 	int NumberOfPlays = 0;
