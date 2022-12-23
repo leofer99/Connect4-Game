@@ -1,0 +1,278 @@
+//-----------------------------------------------------------------------------------------------
+void Board::AIPlay(int selectedColumn, string AIlevel, int winnerSequenceLength) const
+{
+	//wouldThereBeAWinner(); playerSymbol = "O"
+	int HighestDimension = max(numC, numL);
+
+	double counting_points = 0;
+	double counting_symbols = 0;
+
+	
+
+	string winner = ""; // "Player1", "Player2" or "".
+
+	vector < vector <string> > test_board = board;
+
+	int NotFoundInStr = string::npos;
+
+	string ComputerSymbol = "O";
+	string HumanSymbol = "X";
+	string emptySymbolStr = "";
+
+
+	bool change = false;
+
+
+
+	// AI Easy - Places pieces randomly.
+	if (AIlevel == "Computer_Easy")
+	{
+		// AI_move = min + (rand() % (int)(max - min + 1)) / min=0 e max=numC
+		int AI_move = rand() % (int)(numC + 1); //random number between 0 and numC
+
+		test_board.at(topline.at(AI_move)).at(AI_move) = ComputerSymbol;
+		board = test_board; // erro?
+	}
+
+
+	// AI Medium - Plays most of the time randomly, except when the AI can get a win or stop the opponent for winning. 
+	else if (AIlevel == "Computer_Medium")
+	{
+		change = false;
+		// Insert a piece in every column of the test_board, a copy of the original board.
+
+		for (int i = 0; i < numC; i++)
+		{
+			test_board.at(topline.at(i)).at(i) = ComputerSymbol;
+			winner = board.isThereAWinner(test_board);
+			test_board.at(topline.at(i)).at(i) = emptySymbol;
+
+			if (winner == "Player2")
+				board.at(topline.at(i)).at(i) = ComputerSymbol; change = true; break; // erro?
+
+			test_board.at(topline.at(i)).at(i) = HumanSymbol;
+			winner = board.isThereAWinner(test_board);
+			test_board.at(topline.at(i)).at(i) = emptySymbol;
+
+			if (winner == "Player1")
+				board.at(topline.at(i)).at(i) = ComputerSymbol; change = true; break; // erro?
+
+
+		}
+
+		if (change == false)
+		{
+			int AI_move = rand() % (int)(numC + 1); //random number between 0 and numC
+
+			test_board.at(topline.at(AI_move)).at(AI_move) = ComputerSymbol;
+			board = test_board; // erro?
+
+		}
+
+
+		// AI Hard - Plays most of the time randomly, except when the AI can get a win or stop the opponent for winning. 
+		else if (AIlevel == "Computer_Hard")
+		{
+			
+			
+			
+			
+			change = false;
+
+			for (int i = 0; i < numC; i++)
+			{
+				test_board.at(topline.at(i)).at(i) = ComputerSymbol;
+				string winner = board.isThereAWinner(test_board);
+				test_board.at(topline.at(i)).at(i) = emptySymbol;
+
+				if (winner == "Player2")
+					board.at(topline.at(i)).at(i) = ComputerSymbol; change = true; break;
+
+				test_board.at(topline.at(i)).at(i) = "X";
+				string winner = board.isThereAWinner(test_board);
+				test_board.at(topline.at(i)).at(i) = emptySymbol;
+
+				if (winner == "Player1")
+					board.at(topline.at(i)).at(i) = "O"; change = true; break;
+
+
+			}
+
+			if (change == false)
+			{
+
+				for (int i = 0; i < winnerSequenceLength; i++)
+					emptySymbolStr = emptySymbolStr + emptySymbol;
+
+				string combination_human = emptySymbolStr;
+				string combination_computer = emptySymbolStr;
+
+
+				vector<string> all_combinations_computer{};
+				vector<string> all_combinations_human{};
+
+
+				int counter = 1;
+				while (counter <= winnerSequenceLength)
+				{
+					for (int i = 0; i < counter; i++)
+					{
+						combination_computer.at(i) = ComputerSymbol[0];
+						combination_human.at(i) = HumanSymbol[0];
+					}
+
+					all_combinations_computer.push_back(combination_computer);
+					all_combinations_human.push_back(combination_human);
+
+					for (int j = 0; j + counter < winnerSequenceLength; j++)
+					{
+						combination_computer.at(j + counter) = ComputerSymbol[0];
+						combination_computer.at(j) = emptySymbol[0];
+
+						combination_human.at(j + counter) = HumanSymbol[0];
+						combination_human.at(j) = emptySymbol[0];
+
+						all_combinations_computer.push_back(combination_computer);
+						all_combinations_human.push_back(combination_human);
+
+
+					} //XXXXX. .XXXXX
+
+					combination_human = emptySymbolStr;
+					combination_computer = emptySymbolStr;
+
+					counter++;
+				}
+
+				reverse(all_combinations_computer.begin(), all_combinations_computer.end());
+
+				reverse(all_combinations_human.begin(), all_combinations_human.end());
+
+
+				//vector <string> combinations = ;
+
+				// if winnerSequenceLength == 6;
+				// XX.... | .XX... | ..XX..  | ...XX. | ....XX
+				// XXX... | .XXX.. | ..XXX.  | ...XXX
+				// XXXX.. | .XXXX. | ..XXXX
+				// XXXXX. | .XXXX
+
+				//string verticalStrWithoutExtraPiece = "";
+				string verticalStr = "";
+
+				//string horizontalStrWithoutExtraPiece = "";
+				string horizontalStr = "";
+
+				//string positiveDiagonalStrWithoutExtraPiece = ""; // (/)
+				string positiveDiagonalStr = ""; // (/)
+
+				//string negativeDiagonalStrWithoutExtraPiece = ""; // (\)
+				string negativeDiagonalStr = ""; // (\)
+
+
+				vector <double> points = vector <double>(numC, 0);
+
+
+
+				//VerticalSTR
+				for (int col = 0; col < numC; col++)
+				{
+
+					if (topline.at(col) != -1) // -1 -> column full
+					{
+						test_board.at(topline.at(col)).at(col) = ComputerSymbol;
+
+
+
+						for (int lin = 0; lin < numL; lin++)
+						{
+							verticalStr = verticalStr + test_board.at(lin).at(col);
+
+						}
+								
+
+
+						for (int i = 0; i < all_combinations_computer.size(); i++)
+						{
+
+							if (verticalStr.find(all_combinations_computer.at(i)) != NotFoundInStr)
+							{
+								counting_points = count(verticalStr.begin(), verticalStr.end(), all_combinations_computer.at(i));
+								counting_symbols = count(all_combinations_computer.at(i).begin(), all_combinations_computer.at(i).end(), ComputerSymbol);
+								if (counting_symbols == winnerSequenceLength)
+									counting_symbols = 1000;
+
+								points[col] += counting_points* counting_symbols;
+
+							}
+
+						}
+						verticalStr = "";
+						test_board.at(topline.at(col)).at(col) = emptySymbol;
+
+					}
+
+				}
+
+
+				//HorizontalSTR
+				for (int col = 0; col < numC; col++)
+				{
+
+					if (topline.at(col) != -1) // -1 -> column full
+					{
+						test_board.at(topline.at(col)).at(col) = ComputerSymbol;
+						
+
+
+						for (int col1 = 0; col1 < numC; col1++)
+						{
+							
+							horizontalStr = horizontalStr + test_board.at(topline.at(col)).at(col1);
+						}
+
+
+
+						for (int i = 0; i < all_combinations_computer.size(); i++)
+						{
+
+							if (horizontalStr.find(all_combinations_computer.at(i)) != NotFoundInStr)
+							{
+								counting_points = count(horizontalStr.begin(), horizontalStr.end(), all_combinations_computer.at(i));
+								counting_symbols = count(all_combinations_computer.at(i).begin(), all_combinations_computer.at(i).end(), ComputerSymbol);
+								if (counting_symbols == winnerSequenceLength)
+									counting_symbols = 1000;
+
+								points[col] += counting_points * counting_symbols;
+							}
+
+						}
+						horizontalStr = "";
+						test_board.at(topline.at(col)).at(col) = emptySymbol;
+
+
+					}
+
+
+
+				}
+
+
+
+			}
+
+
+
+
+
+
+
+
+
+		}
+
+
+	}
+
+}
+//-----------------------------------------------------------------------------------------------
