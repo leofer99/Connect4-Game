@@ -1,232 +1,71 @@
 //-----------------------------------------------------------------------------------------------
-string Board::isThereAWinner(vector<vector<string>> board) const
-{
-	//checking for horizontal win:
-	string lineWin = "";
-	for (int lin = 0; lin < GetNumLines() - 1; lin++)
-
-		//vector< vector <string> > poard; //?????????????
-
-
-	//vector< int> possibleHorizontalWins;
-	//possibleHorizontalWins = vector <int>(numL, 0);
-	//vector<int> possibleVerticalWins = vector <int>(numC, 0);
-
-
-	int HighestDimension;
-	int LowestDimension;
-	int possibleHorizontalWins = 0;
-	int possibleVerticalWins = 0;
-	int possibleNegativeDiagonalWins = 0; // (\)
-	int possiblePositiveDiagonalWins = 0; // (/)
-	string linWin = "";
-	string ColWin = "";
-	string NegativeDiagonalWin = "";// (\)
-	string PositiveDiagonalWin = "";// (/)
-
-	int NotFoundInStr = string::npos;
-
-	// Iterator for each vector inside the 2-D vector
-	vector<string>::const_iterator horizontal_it;
-
-	string winnerSequence1 = "XXXX";
-	string winnerSequence2 = "OOOO";
-	//horizontal_it = board[lin].begin();
-
-
-
-	
-		// Vitória horizontal
-	for (int lin = 0; lin < numL; lin++)
-	{
-		for (horizontal_it = board[lin].begin(); horizontal_it != board[lin].end(); horizontal_it++)
-		{
-			linWin = linWin + *horizontal_it;
-			if (linWin.find(winnerSequence1) == NotFoundInStr)
-				possibleHorizontalWins += 0;
-			else
-				possibleHorizontalWins += 1;
-
-			if ((linWin.find(winnerSequence2) == NotFoundInStr) && (possibleHorizontalWins < 1))
-				possibleHorizontalWins += 0;
-			else if (possibleHorizontalWins < 1)
-				possibleHorizontalWins += -1;
-
-		}
-		//cout << "\n\n" << linWin << endl;
-		linWin = ""; //cleaning after each iteration
-
-	}
-
-	// Iterator for the 2-D vector
-	vector<vector<string>>::const_iterator vertical_it;
-
-	vector<string> boardLine;
-	boardLine = vector <string>(numC, "");
-
-	// Vitória vertical
-	for (int col = 0; col < numC; col++)
-	{
-		for (vertical_it = board.begin(); vertical_it != board.end(); vertical_it++)
-		{
-			boardLine = *vertical_it; //analyses each line of the board and takes the 1st element, forming the 1st column. Keeps going for every column. 
-			ColWin = ColWin + boardLine.at(col);
-			if (ColWin.find(winnerSequence1) == NotFoundInStr)
-				possibleVerticalWins += 0;
-			else
-				possibleVerticalWins += 1;
-
-			if ((ColWin.find(winnerSequence2) == NotFoundInStr) && (possibleVerticalWins < 1))
-				possibleVerticalWins += 0;
-			else if (possibleVerticalWins < 1)
-				possibleVerticalWins += -1;
-
-		}
-		ColWin = ""; //cleaning
-	}
-	
-	//PositiveDiagonalWin PossiblePositiveDiagonalWin
-	// Vitória diagonalLeftToRight (/)
-	int HighestDimension = max(numC, numL);
-	int LowestDimension = min(numL, numC);
-
-	for (int col = 0; col < numC; col++)
-	{
-		for (int lin = 0; lin < numL; lin++)
-		{
-			for (int i = 0; i < HighestDimension; i++)
-			{
-				if ((lin + i < numL) && (col + i < numC))
-					PositiveDiagonalWin = PositiveDiagonalWin + board.at(lin + i).at(col + i);
-				else
-					break;
-			}
-
-			if (PositiveDiagonalWin.find(winnerSequence1) != NotFoundInStr) //if we find player1 win 
-				possiblePositiveDiagonalWins += 1;
-
-			else if ((PositiveDiagonalWin.find(winnerSequence2) != NotFoundInStr) && (possibleVerticalWins < 1)) //if we find player2 win
-				possiblePositiveDiagonalWins += -1;
-
-			PositiveDiagonalWin = "";
-		}
-	}
-
-	//NegativeDiagonalWin possibleNegativeDiagonalWin
-	// Vitória diagonalRightToLeft (\)
-
-	for (int col = 0; col < numC; col++)
-	{
-		for (int lin = 0; lin < numL; lin++)
-		{
-			for (int i = 0; i < HighestDimension; i++)
-			{
-				if ((lin + i < numL) && (col - i >= 0))
-				{
-					NegativeDiagonalWin = NegativeDiagonalWin + board.at(lin + i).at(col - i);
-				}
-				else
-					break;
-			}
-
-			if (NegativeDiagonalWin.find(winnerSequence1) != NotFoundInStr)
-				possibleNegativeDiagonalWins += 1;
-
-			else if ((PositiveDiagonalWin.find(winnerSequence2) != NotFoundInStr) && (possibleVerticalWins < 1))
-				possibleNegativeDiagonalWins += -1;
-
-			NegativeDiagonalWin = "";
-		}
-	}
-
-	string winner = "";
-
-	if (possibleNegativeDiagonalWins < 0 || possiblePositiveDiagonalWins < 0 || possibleVerticalWins < 0 || possibleHorizontalWins < 0)
-	{
-		winner = "Player2";
-		return winner;
-	}
-		
-
-	else if (possibleNegativeDiagonalWins > 0 || possiblePositiveDiagonalWins > 0 || possibleVerticalWins > 0 || possibleHorizontalWins > 0)
-	{
-		winner = "Player1";
-		return winner;
-	}
-		
-	else
-	{
-		winner = "";
-		return winner;
-	}
-		
-
-}
-//-----------------------------------------------------------------------------------------------
-
-
-//-----------------------------------------------------------------------------------------------
-void Board::AIPlay(int selectedColumn, string AIlevel) const
+void Board::AIPlay(class player player)
 {
 	//wouldThereBeAWinner(); playerSymbol = "O"
+	string AIlevel = player.GetPlayerType();
+	//vector < vector <string> > test_board = board;
+	Board test_board = Board(numL, numC, emptySymbol, numN);
 
+	int HighestDimension = max(numC, numL);
+	double counting_points = 0;
+	double counting_symbols = 0;
+	string winner = ""; // "Player1", "Player2" or "".
+	int NotFoundInStr = string::npos;
 
-	vector < vector <string> > test_board = board;
+	string ComputerSymbol = "O";
+	string HumanSymbol = "X";
+	string emptySymbolStr = "";
+	bool change = false;
+	int AI_move = 1;
 	// AI Easy - Places pieces randomly.
 	if (AIlevel == "Computer_Easy")
 	{
 		// AI_move = min + (rand() % (int)(max - min + 1)) / min=0 e max=numC
-
-		int AI_move = rand() % (int)(numC + 1); //random number between 0 and numC
-
-		test_board.at(topline.at(AI_move)).at(AI_move) = "O";
-		board = test_board; // erro?
-
+		AI_move = rand() % (int)(numC+1); //random number between 0 and numC
+		while (topline.at(AI_move) == -1)
+		{
+			int AI_move = rand() % (int)(numC+1);
+		}
+		//string symbol= "O";
+		this->AI_selectedColumn = AI_move;
+		//test_board.board.at(topline.at(AI_move)).at(AI_move) = "O";
 
 	}
-
-
-	// AI Medium - Plays most of the time radomly, except when the AI can get a win or stop the opponent for winning. 
+	
+	// AI Medium - Plays most of the time randomly, except when the AI can get a win or stop the opponent for winning. 
 	else if (AIlevel == "Computer_Medium")
 	{
-		
 		// Insert a piece in every column of the test_board, a copy of the original board.
-
 		for (int i = 0; i < numC; i++)
 		{
+			test_board.board.at(topline.at(i)).at(i) = "O";
+			winner = test_board.isThereAWinner();
+			test_board.board.at(topline.at(i)).at(i) = emptySymbol;
 
-			test_board.at(topline.at(i)).at(i) = "O";
-			string winner = board.isThereAWinner(test_board);
-			test_board.at(topline.at(i)).at(i) = emptySymbol;
+			if (winner == "isWinner")
+				this->AI_selectedColumn = i; break;
 
-			if (winner=="Player2")
-				board.at(topline.at(i)).at(i) = "O"; break; // erro?
+			test_board.board.at(topline.at(i)).at(i) = "X";
+			winner = test_board.isThereAWinner();
+			test_board.board.at(topline.at(i)).at(i) = emptySymbol;
 
-			test_board.at(topline.at(i)).at(i) = "X";
-			string winner = board.isThereAWinner(test_board);
-			test_board.at(topline.at(i)).at(i) = emptySymbol;
+			if (winner == "isWinner")
+				this->AI_selectedColumn = i; break;
 
-			if (winner == "Player1")
-				board.at(topline.at(i)).at(i) = "O"; break; // erro?
+
+			AI_move = rand() % (int)(numC + 1); //random number between 0 and numC
+			while (topline.at(AI_move) == -1)
+			{
+				int AI_move = rand() % (int)(numC + 1);
+			}
+			//string symbol= "O";
+			this->AI_selectedColumn = AI_move;
+
 
 
 
 		}
-		
-
 	}
 
-
-
-
-	// AI Hard
-	else if (AIlevel == "Computer_Hard")
-	{
-
-	}
-
-
-
-	
 }
 //-----------------------------------------------------------------------------------------------
