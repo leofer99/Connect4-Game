@@ -1,0 +1,73 @@
+//-----------------------------------------------------------------------------------------------
+int SetNumLines()
+{
+
+	int numL = 0;
+	string numLStr = "";
+	while (numL < 6 || numL > 10)
+	{
+		cout << "Please, set the dimensions of the board (Minimum dimension: 6x6, Maximum dimension: 10x10). Number of Lines: ";
+		cin >> numLStr;
+
+		bool isInt = (numLStr.find_first_not_of("0123456789") == std::string::npos);
+
+
+		if (isInt == true)
+			numL = stoi(numLStr);
+
+		if (numL < 6 || numL > 10)
+		{
+			cout << "Invalid Number of Lines, must be between 6 and 10!! \n";
+		}
+	}
+	return numL;
+}
+//-----------------------------------------------------------------------------------------------
+int SetNumColumns()
+{
+	int numC = 0;
+	string numCStr = "";
+	while (numC < 6 || numC > 10)
+	{
+		cout << "Number of Columns: ";
+		cin >> numCStr;
+
+		bool isInt = (numCStr.find_first_not_of("0123456789") == std::string::npos);
+
+
+		if (isInt == true)
+			numC = stoi(numCStr);
+
+
+		if (numC < 6 || numC > 10)
+		{
+			cout << "Invalid Number of Columns, must be between 6 and 10!! \n";
+		}
+	}
+	return numC;
+}
+//-----------------------------------------------------------------------------------------------
+int SetConditionsForWinner(int numL, int numC)
+{
+	int numN = 0;
+	string numNStr = "";
+
+	while (numN < 4 || numN> max(numC, numL))
+	{
+		cout << "Please, choose how many consecutive symbols are needed to win (Minimun = 4):  ";
+		cin >> numNStr;
+
+		bool isInt = (numNStr.find_first_not_of("0123456789") == std::string::npos);
+
+
+		if (isInt==true)
+			numN = stoi(numNStr);
+
+		if (numN < 4 || numN> max(numC, numL))
+		{
+			cout << "Invalid Condition!! \n";
+		}
+	}
+	return numN;
+}
+//-----------------------------------------------------------------------------------------------
