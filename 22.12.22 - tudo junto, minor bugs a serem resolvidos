@@ -178,10 +178,10 @@ private:
 	//representa a linha vazia mais baixa (para jogar nessa quando for escolhida essa coluna, para não ter de procurar nas linhas acima)
 	vector <char> ColumnLegend;
 	vector< vector<string>> board;
-	//vector< vector<string>> test_board;
 	int numL, numC, numN;
 	string emptySymbol; //flexibilidade do que é considerado espaço vazio no tabuleiro.
 	int numEmptyCells; //(fica - 1 a cada jogada.Ao chegar a zero, declara empate se ninguém tiver dado.)
+	string headline_displayed;
 	string headline;
 	string winnerSequence1;
 	string winnerSequence2;
@@ -289,7 +289,6 @@ When the value is 0, it will play at the top of the column. When the value is -1
 int Board::SelectColumn(player player) const
 {
 	string InputedColumn = "";
-	//const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	string PlayerName = player.GetName();
 	string PlayerType = player.GetPlayerType();
 	int Not_found = -1;
@@ -303,18 +302,24 @@ int Board::SelectColumn(player player) const
 			cout << "\n" << PlayerName << ", in which column, do you want to insert your piece?" << endl;
 			cin >> InputedColumn;
 
-			InputedColumn = "a";
+			//InputedColumn = "a";
 
-			if ((InputedColumn.size() != 1) || (int(InputedColumn[0]) > int('z'))) // garante que o input é somente uma letra
+			if ((InputedColumn.size() != 1) ) // garante que o input é somente uma letra
 				InputedColumn = "_"; //in this case, it will not detect the value in the headline and will output an error
+				
+				//cout << "Falhou teste: não é letra " << InputedColumn;
 
 			if (int(InputedColumn[0]) > int('Z')) // garante que as minúsculas sejam convertidas em maiúsculas
 				InputedColumn[0] = char(int(InputedColumn[0]) - 32);
-				cout << InputedColumn[0];
+				
+				//cout << "Minúscula convertida em maiuscula" << InputedColumn[0];
 
 			PossibleColumnSelected = int(headline.find(InputedColumn[0]));
+			/*cout << "Valor:" << InputedColumn[0];
+			cout << "Coluna a que corresponde: (-1 se não for a nenhuma) " << int(headline.find(InputedColumn[0]));
+			*/
 
-			if (PossibleColumnSelected == Not_found) // garante que o inputed_column averiguado encontra-se na headline
+			if (PossibleColumnSelected == Not_found) // garante que o inputed_column averiguado se encontra na headline
 				cout << "\nError! You must insert a valid input." << endl;
 
 			else //if the value is valid
@@ -332,6 +337,8 @@ int Board::SelectColumn(player player) const
 		PossibleColumnSelected = AI_selectedColumn;
 
 	int LastColumnPlayed = PossibleColumnSelected;
+
+	//cout << IsColumnValid;
 
 	return LastColumnPlayed;
 }
@@ -358,9 +365,13 @@ string Board::isFull(int NumberOfPlays, int NumberOfBoardCells) const
 void Board::Headline() 
 {
 	int spacePerLetter = 3; //space occupied per Letter
-	const string alphabet = " A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z";
-	string headline = alphabet.substr(0, spacePerLetter*GetNumColumns() ); //creates substring, according to the number of columns in the board. 
-	this->headline=headline;
+	const string alphabet_w_spaces = " A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z";
+	string headline_displayed = alphabet_w_spaces.substr(0, spacePerLetter*GetNumColumns() ); //creates substring, according to the number of columns in the board. 
+	this->headline_displayed=headline_displayed;
+
+	const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	string headline= alphabet.substr(0, GetNumColumns()); //creates substring, according to the number of columns in the board. 
+	this->headline = headline;
 }
 //-----------------------------------------------------------------------------------------------
 void Board::show() const
@@ -374,7 +385,7 @@ void Board::show() const
 	/*const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	string headline = alphabet.substr(0, GetNumColumns() );*/
 
-	cout << headline << endl;
+	cout << headline_displayed << endl;
 	//cout <<"Headline" << endl;
 
 	for (int col = 0; col < numC; col++) //outputs board
@@ -386,7 +397,7 @@ void Board::show() const
 				cout << ' ' << board.at(col).at(lin) << ' ';
 		}
 
-	cout << headline << endl;;
+	cout << headline_displayed << endl;;
 
 }
 //-----------------------------------------------------------------------------------------------
