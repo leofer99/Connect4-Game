@@ -322,8 +322,6 @@ int Board::SelectColumn(player player)
 
 			PossibleColumnSelected = int(headline.find(InputedColumn[0]));
 			PossibleColumnSelected = PossibleColumnSelected; 
-			cout << "Valor:" << InputedColumn[0];
-			cout << "Coluna a que corresponde: (-1 se não for a nenhuma) " << int(headline.find(InputedColumn[0]));
 
 			if (PossibleColumnSelected == Not_found) // garante que o inputed_column averiguado se encontra na headline
 				cout << "\nError! You must insert a valid input." << endl;
@@ -344,7 +342,6 @@ int Board::SelectColumn(player player)
 
 	int LastColumnPlayed = PossibleColumnSelected;
 	this->LastColumnPlayed = LastColumnPlayed;
-	cout << "LastCol:" << LastColumnPlayed;
 	return LastColumnPlayed;
 }
 //-----------------------------------------------------------------------------------------------
@@ -435,8 +432,7 @@ string Board::isThereAWinner()
 		{	linWin = linWin + *horizontal_it;
 		}
 
-		cout << "linWin: " << linWin << endl;
-		cout << "winner seq1:" << winnerSequence1 << endl;
+		//cout << "linWin: " << linWin << endl;
 
 		if (linWin.find(winnerSequence1) == NotFoundInStr)
 			possibleHorizontalWins = 0;
@@ -466,17 +462,18 @@ string Board::isThereAWinner()
 		{
 			boardLine = *vertical_it; //analyses each line of the board and takes the 1st element, forming the 1st column. Keeps going for every column. 
 			ColWin = ColWin + boardLine.at(col);
-			if (ColWin.find(winnerSequence1) == NotFoundInStr)
-				possibleVerticalWins = 0;
-			else
-				possibleVerticalWins = 1;
-
-			if ((ColWin.find(winnerSequence2) == NotFoundInStr) && (possibleVerticalWins < 1))
-				possibleVerticalWins = 0;
-			else if (possibleVerticalWins != 1)
-				possibleVerticalWins = -1;
 
 		}
+		if (ColWin.find(winnerSequence1) == NotFoundInStr)
+			possibleVerticalWins = 0;
+		else
+			possibleVerticalWins = 1;
+
+		if ((ColWin.find(winnerSequence2) == NotFoundInStr) && (possibleVerticalWins < 1))
+			possibleVerticalWins = 0;
+		else if (possibleVerticalWins != 1)
+			possibleVerticalWins = -1;
+
 		ColWin = ""; //cleaning
 	}
 	cout << "Vertical win if 1: " << possibleVerticalWins;
@@ -504,7 +501,9 @@ string Board::isThereAWinner()
 
 			PositiveDiagonalWin = "";
 		}
+		//cout << "linWin: " << linWin << endl;
 	}
+
 	cout << "Positive diag win if 1: " << possiblePositiveDiagonalWins;
 
 	//NegativeDiagonalWin possibleNegativeDiagonalWin
@@ -555,7 +554,7 @@ string Board::isThereAWinner()
 		winner = "No Winner Yet";
 		return winner;
 	}
-
+	cout << "Win: " << winner << endl;
 }
 //-----------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------
@@ -766,11 +765,11 @@ void Game()
 	player playerPlaying = player1; //player1 starts
 	string strPlayerPlaying = "player1";
 	board.Headline(); //prepares board headline
+	board.show(); //shows board with headline directly above and below
 
 	//Game Start
 	while (true)
 	{
-		board.show(); //shows board with headline directly above and below
 		int LastColumnPlayed = board.SelectColumn(playerPlaying); //player chooses column
 		board.putDiscAtColumn(playerPlaying);
 		NumberOfPlays = NumberOfPlays + 1;
@@ -792,6 +791,7 @@ void Game()
 
 			if (IsThereATie == "It's a Tie!") //checks for tie
 			{
+				cout << "Test- Is Tie";
 				winnerInfo = "Empate, não há vencedor.";
 				GameEnd(player1, player2, winnerInfo); //game ends
 				break;
@@ -799,21 +799,22 @@ void Game()
 
 			else //if there is no tie, game keeps going: players switch turns
 			{
+				cout << "PlayerPlaying" << strPlayerPlaying;
+
 				if (strPlayerPlaying == "player1")
 					//if (playerPlaying.GetNumber() == 1)
 				{
-					player1 = playerPlaying; //saves last play
-					playerPlaying = player2; //switches player
-					//strPlayerPlaying = "player2";
-					break;
+					cout << "Test- game keeps going- switch to player2";
+					strPlayerPlaying = "player2"; //switches player
+					playerPlaying = player2;
 				}
 				else if (strPlayerPlaying == "player2")
 					//else if (playerPlaying.GetNumber() == 2)
 				{
-					player2 = playerPlaying; //saves last play
-					playerPlaying = player1; //switches player
-					strPlayerPlaying = "player1";
-					break;
+					cout << "Test- game keeps going - switch to player1";
+					strPlayerPlaying = "player1";  //switches player
+					playerPlaying = player1;
+
 				}
 			}
 		}
