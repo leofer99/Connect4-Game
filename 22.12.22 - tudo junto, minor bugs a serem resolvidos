@@ -200,7 +200,8 @@ public:
 	vector <int> topline;
 	int LastLinePlayed, LastColumnPlayed;
 
-	Board(int numL, int numC, string emptySymbol, int winnersequencelength);
+	Board(int numL, int numC, string emptySymbol, int numN);
+	string buildSequence(int numN, string symbol);
 	void SetEmptySymbol();
 	int GetNumLines() const;
 	int GetNumColumns() const;
@@ -217,20 +218,29 @@ public:
 	//(pode estar numa classe complementar - Classe Game : encarregar - se de ver conteúdo, verificar vencedor
 	void AIPlay(int selectedColumn, string AIlevel);
 
-
 };
 //--------------------------------------------------------------------------------------
-Board::Board(int numL, int numC, string emptySymbol, int winnersequencelength)
+Board::Board(int numL, int numC, string emptySymbol, int numN)
 {
 	this->numL = numL;
 	this->numC = numC;
 	this->emptySymbol = emptySymbol;
-	string winnerSequence1(numN, 'X');
-	string winnerSequence2(numN, 'O');
-	this->winnerSequence1 = winnerSequence1;
-	this->winnerSequence2 = winnerSequence2;
+
+	this->winnerSequence1 = buildSequence(numN, "X");
+	this->winnerSequence2 = buildSequence(numN, "O");
+
 	this->topline = vector<int>(numC, numL);
 	this->board = vector <vector<string>>(numL, vector<string>(numC, emptySymbol));
+}
+//--------------------------------------------------------------------------------------
+string Board::buildSequence(int numN, string symbol)
+{
+	string sequence = symbol;
+	for (int i = 0; i < numN - 1; i++)
+	{
+		sequence = sequence + symbol;
+	}
+	return sequence;
 }
 //--------------------------------------------------------------------------------------
 void Board::SetEmptySymbol()
@@ -281,7 +291,6 @@ When the value is 0, it will play at the top of the column. When the value is -1
 // after every play: 
 	int ColumnHeight = topline.at(LastColumnPlayed);
 	this->LastLinePlayed = ColumnHeight - 1;
-	cout << "LastLine Played (dentro TopLine): " << LastLinePlayed;
 	topline.at(LastColumnPlayed) = this->LastLinePlayed;
 	return this->LastLinePlayed;
 }
@@ -423,23 +432,26 @@ string Board::isThereAWinner()
 	for (int lin = 0; lin < numL; lin++)
 	{
 		for (horizontal_it = board[lin].begin(); horizontal_it != board[lin].end(); horizontal_it++)
-		{
-			//HighestDimension = 1;
-			linWin = linWin + *horizontal_it;
-			if (linWin.find(winnerSequence1) == NotFoundInStr)
-				possibleHorizontalWins = 0;
-			else
-				possibleHorizontalWins = 1;
-
-			if ((linWin.find(winnerSequence2) == NotFoundInStr) && (possibleHorizontalWins < 1))
-				possibleHorizontalWins = 0;
-			else if (possibleHorizontalWins != 1)
-				possibleHorizontalWins = -1;
-
+		{	linWin = linWin + *horizontal_it;
 		}
-		//cout << "\n\n" << linWin << endl;
+
+		cout << "linWin: " << linWin << endl;
+		cout << "winner seq1:" << winnerSequence1 << endl;
+
+		if (linWin.find(winnerSequence1) == NotFoundInStr)
+			possibleHorizontalWins = 0;
+		else
+			possibleHorizontalWins = 1;
+
+		if ((linWin.find(winnerSequence2) == NotFoundInStr) && (possibleHorizontalWins < 1))
+			possibleHorizontalWins = 0;
+		else if (possibleHorizontalWins != 1)
+			possibleHorizontalWins = -1;
+ 
 		linWin = ""; //cleaning after each iteration
 	}
+	cout <<"Horizontal win if 1: " << possibleHorizontalWins;
+	//cout << "linWin: " << possibleHorizontalWins;
 
 	// Iterator for the 2-D vector
 	vector<vector<string>>::const_iterator vertical_it;
@@ -467,6 +479,7 @@ string Board::isThereAWinner()
 		}
 		ColWin = ""; //cleaning
 	}
+	cout << "Vertical win if 1: " << possibleVerticalWins;
 
 	//PositiveDiagonalWin PossiblePositiveDiagonalWin
 	// Vitória diagonalLeftToRight (/)
@@ -492,6 +505,7 @@ string Board::isThereAWinner()
 			PositiveDiagonalWin = "";
 		}
 	}
+	cout << "Positive diag win if 1: " << possiblePositiveDiagonalWins;
 
 	//NegativeDiagonalWin possibleNegativeDiagonalWin
 	// Vitória diagonalRightToLeft (\)
@@ -519,6 +533,7 @@ string Board::isThereAWinner()
 			NegativeDiagonalWin = "";
 		}
 	}
+	cout << "Neg diag win if 1: " << possibleNegativeDiagonalWins;
 
 	string winner = "";
 
@@ -723,6 +738,7 @@ void GameEnd(player player1, player player2, string winnerInfo)
 
 	}
 }
+//-----------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------
 void Game()
 {	//Players' Set-Up
