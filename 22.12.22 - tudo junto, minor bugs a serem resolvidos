@@ -615,11 +615,12 @@ int SetNumLines()
 			cout << "Invalid Number of Lines, must be between 6 and 10!! \n";
 		}
 	}
+	return numL;
 }
 //-----------------------------------------------------------------------------------------------
 int SetNumColumns()
 {
-	int numC;
+	int numC=0;
 	while (numC < 6 || numC > 10)
 	{
 		cout << "Number of Columns: ";
@@ -629,11 +630,12 @@ int SetNumColumns()
 			cout << "Invalid Number of Columns, must be between 6 and 10!! \n";
 		}
 	}
+	return numC;
 }
 //-----------------------------------------------------------------------------------------------
 int SetConditionsForWinner(int numL, int numC)
 {
-	int numN;
+	int numN=0;
 
 	while (numN < 4 || numN> max(numC, numL))
 	{
@@ -645,6 +647,7 @@ int SetConditionsForWinner(int numL, int numC)
 			cout << "Invalid Condition!! \n";
 		}
 	}
+	return numN;
 }
 //-----------------------------------------------------------------------------------------------
 char time()
