@@ -376,26 +376,31 @@ void Board::Headline()
 //-----------------------------------------------------------------------------------------------
 void Board::show() const
 {
-	//string line = "";
-	//for (int i = 0; i<numL; i++)
-	//{
-	//	line = line + board[i];
-	//}
-	//cout << '\n';
-	/*const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	string headline = alphabet.substr(0, GetNumColumns() );*/
-
 	cout << headline_displayed << endl;
-	//cout <<"Headline" << endl;
+	
+	// Iterator for the 2-D vector
+	vector<vector<string>>::iterator it1;
 
-	for (int col = 0; col < numC; col++) //outputs board
-		for (int lin = 0; lin < numL; lin++)
-		{
-			if (col == numC - 1) //if it's a value in the last column, goes to the next line
-				cout << ' ' << board.at(col).at(lin) << endl;
-			else
-				cout << ' ' << board.at(col).at(lin) << ' ';
-		}
+	// Iterator for each vector inside the 2-D vector
+	vector<string>::iterator it2;
+
+	vector<vector<string>> show_board = board;
+
+	// Traversing a 2-D vector using iterators
+	for (it1 = show_board.begin(); it1 != show_board.end(); it1++) {
+		for (it2 = it1->begin(); it2 != it1->end(); it2++)
+			cout << " " << *it2 << " ";
+		cout << endl;
+	}
+
+	//for (int col = 0; col < numC; col++) //outputs board
+	//	for (int lin = 0; lin < numL; lin++)
+	//	{
+	//		if (col == numC - 1) //if it's a value in the last column, goes to the next line
+	//			cout << ' ' << board.at(col).at(lin) << endl;
+	//		else
+	//			cout << ' ' << board.at(col).at(lin) << ' ';
+	//	}
 
 	cout << headline_displayed << endl;;
 
@@ -736,6 +741,7 @@ void Game()
 	{
 		board.show(); //shows board with headline directly above and below
 		int LastColumnPlayed = board.SelectColumn(playerPlaying); //player chooses column
+		cout << LastColumnPlayed;
 		board.putDiscAtColumn(playerPlaying);
 		NumberOfPlays = NumberOfPlays + 1;
 		GameResult = board.isThereAWinner(); //tests if there is a winner
