@@ -431,22 +431,18 @@ string Board::isThereAWinner()
 		for (horizontal_it = board[lin].begin(); horizontal_it != board[lin].end(); horizontal_it++)
 		{	linWin = linWin + *horizontal_it;
 		}
-
 		//cout << "linWin: " << linWin << endl;
 
-		if (linWin.find(winnerSequence1) == NotFoundInStr)
+		if (linWin.find(winnerSequence1) == NotFoundInStr && linWin.find(winnerSequence2) == NotFoundInStr) //when player2 hasn't won and when player1 hasn't won
 			possibleHorizontalWins = 0;
-		else
+		else if (linWin.find(winnerSequence1) != NotFoundInStr) //player1 has won
 			possibleHorizontalWins = 1;
-
-		if ((linWin.find(winnerSequence2) == NotFoundInStr) && (possibleHorizontalWins < 1))
-			possibleHorizontalWins = 0;
-		else if (possibleHorizontalWins != 1)
+		else if (linWin.find(winnerSequence2) != NotFoundInStr) //player2 has won
 			possibleHorizontalWins = -1;
  
 		linWin = ""; //cleaning after each iteration
 	}
-	cout <<"Horizontal win if 1: " << possibleHorizontalWins;
+	cout <<"Horizontal win if 1: " << possibleHorizontalWins << endl;;
 	//cout << "linWin: " << possibleHorizontalWins;
 
 	// Iterator for the 2-D vector
@@ -464,14 +460,15 @@ string Board::isThereAWinner()
 			ColWin = ColWin + boardLine.at(col);
 
 		}
-		if (ColWin.find(winnerSequence1) == NotFoundInStr)
-			possibleVerticalWins = 0;
-		else
-			possibleVerticalWins = 1;
+		/*cout << "vertical find win seq1: " << ColWin.find(winnerSequence1) << endl;
+		cout << "not found: " << NotFoundInStr <<endl;
+		cout << "not found: " << (NotFoundInStr == ColWin.find(winnerSequence1)) << endl;*/
 
-		if ((ColWin.find(winnerSequence2) == NotFoundInStr) && (possibleVerticalWins < 1))
+		if (ColWin.find(winnerSequence1) == NotFoundInStr && ColWin.find(winnerSequence2) == NotFoundInStr ) //when player2 hasn't won and when player1 hasn't won
 			possibleVerticalWins = 0;
-		else if (possibleVerticalWins != 1)
+		else if (ColWin.find(winnerSequence1) != NotFoundInStr) //player1 has won
+			possibleVerticalWins = 1;
+		else if (ColWin.find(winnerSequence2) != NotFoundInStr) //player2 has won
 			possibleVerticalWins = -1;
 
 		ColWin = ""; //cleaning
@@ -493,10 +490,11 @@ string Board::isThereAWinner()
 					break;
 			}
 
-			if (PositiveDiagonalWin.find(winnerSequence1) != NotFoundInStr) //if we find player1 win 
+			if (PositiveDiagonalWin.find(winnerSequence1) == NotFoundInStr && PositiveDiagonalWin.find(winnerSequence2) == NotFoundInStr) //when player2 hasn't won and when player1 hasn't won
+				possiblePositiveDiagonalWins = 0;
+			else if (PositiveDiagonalWin.find(winnerSequence1) != NotFoundInStr) //player1 has won
 				possiblePositiveDiagonalWins = 1;
-
-			else if ((PositiveDiagonalWin.find(winnerSequence2) != NotFoundInStr) && (possibleVerticalWins < 1)) //if we find player2 win
+			else if (PositiveDiagonalWin.find(winnerSequence2) != NotFoundInStr) //player2 has won
 				possiblePositiveDiagonalWins = -1;
 
 			PositiveDiagonalWin = "";
@@ -523,10 +521,11 @@ string Board::isThereAWinner()
 					break;
 			}
 
-			if (NegativeDiagonalWin.find(winnerSequence1) != NotFoundInStr)
+			if (NegativeDiagonalWin.find(winnerSequence1) == NotFoundInStr && NegativeDiagonalWin.find(winnerSequence2) == NotFoundInStr) //when player2 hasn't won and when player1 hasn't won
+				possibleNegativeDiagonalWins = 0;
+			else if (NegativeDiagonalWin.find(winnerSequence1) != NotFoundInStr) //player1 has won
 				possibleNegativeDiagonalWins = 1;
-
-			else if ((PositiveDiagonalWin.find(winnerSequence2) != NotFoundInStr) && (possibleVerticalWins < 1))
+			else if (NegativeDiagonalWin.find(winnerSequence2) != NotFoundInStr) //player2 has won
 				possibleNegativeDiagonalWins = -1;
 
 			NegativeDiagonalWin = "";
@@ -554,7 +553,7 @@ string Board::isThereAWinner()
 		winner = "No Winner Yet";
 		return winner;
 	}
-	cout << "Win: " << winner << endl;
+	cout << "Total Win: " << winner << endl;
 }
 //-----------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------
@@ -717,12 +716,7 @@ char time()
 //-----------------------------------------------------------------------------------------------
 void GameEnd(player player1, player player2, string winnerInfo)
 {
-	string ctrlz;
-	if (ctrlz == "Not Pressed")
-	{
-		//if CTRL-Z is activated, nothing is registered in the file.
-		//if it is not activated/pressed, data is registered in the file
-
+	cout << "Game Has Ended " << winnerInfo << endl;
 		ofstream file;
 		file.open("winner.txt");// Creates the file 
 
@@ -735,7 +729,6 @@ void GameEnd(player player1, player player2, string winnerInfo)
 		unsigned sleep(2); //Sleep the system for 2s 
 		cout << "Thanks for playing, bye :) !! " << endl;
 
-	}
 }
 //-----------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------
@@ -802,16 +795,12 @@ void Game()
 				cout << "PlayerPlaying" << strPlayerPlaying;
 
 				if (strPlayerPlaying == "player1")
-					//if (playerPlaying.GetNumber() == 1)
 				{
-					cout << "Test- game keeps going- switch to player2";
 					strPlayerPlaying = "player2"; //switches player
 					playerPlaying = player2;
 				}
-				else if (strPlayerPlaying == "player2")
-					//else if (playerPlaying.GetNumber() == 2)
-				{
-					cout << "Test- game keeps going - switch to player1";
+				else if (strPlayerPlaying == "player2")	
+				{	
 					strPlayerPlaying = "player1";  //switches player
 					playerPlaying = player1;
 
