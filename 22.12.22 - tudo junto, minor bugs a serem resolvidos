@@ -647,6 +647,20 @@ int SetConditionsForWinner(int numL, int numC)
 	}
 }
 //-----------------------------------------------------------------------------------------------
+char time()
+{
+	time_t t;
+	struct tm* infoTime;
+	char DayTime[20]; //Where the time information will be saved.
+
+	time(&t);
+	infoTime = localtime(&t); //Get the time 
+
+	strftime(DayTime, 20, "%F / %R", infoTime); //Creates the Day and Time with the following format YYYY/MM/DD / HH:MM
+
+	return DayTime[20];
+}
+//-----------------------------------------------------------------------------------------------
 void GameEnd(player player1, player player2, string winnerInfo)
 {
 	string ctrlz;
@@ -668,20 +682,6 @@ void GameEnd(player player1, player player2, string winnerInfo)
 		cout << "Thanks for playing, bye :) !! " << endl;
 
 	}
-}
-//-----------------------------------------------------------------------------------------------
-char time()
-{
-	time_t t;
-	struct tm* infoTime;
-	char DayTime[20]; //Where the time information will be saved.
-
-	time(&t);
-	infoTime = localtime(&t); //Get the time 
-
-	strftime(DayTime, 20, "%F / %R", infoTime); //Creates the Day and Time with the following format YYYY/MM/DD / HH:MM
-
-	return DayTime[20];
 }
 //-----------------------------------------------------------------------------------------------
 void Game()
