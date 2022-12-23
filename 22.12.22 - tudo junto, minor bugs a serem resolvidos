@@ -174,7 +174,7 @@ player Menu(player Enemy_player)
 class Board
 {
 private:
-	vector <int> topline; //representa a linha vazia mais baixa (para jogar nessa quando for escolhida essa coluna, para não ter de procurar nas linhas acima)
+	//representa a linha vazia mais baixa (para jogar nessa quando for escolhida essa coluna, para não ter de procurar nas linhas acima)
 	vector <char> ColumnLegend;
 	vector< vector<string>> board;
 	int numL, numC, numN;
@@ -186,30 +186,34 @@ private:
 	int NumberOfBoardCells = numC * numL;
 
 	//Guardar linha e coluna da última jogada(procurar se há vencedor, apartir dessa posição)
-	int LastLinePlayed, LastColumnPlayed;
 	string LastDiscSymbol;
 	//int ColumnSelected;
 	int AI_selectedColumn;
 	//Guardar LastDiscSymbol(procurar apenas o caráter do último vencedor)
 
 public:
+	//public variables
+	vector <int> topline;
+	int LastLinePlayed, LastColumnPlayed;
+
 	Board(int numL, int numC, string emptySymbol, int winnersequencelength);
 	void SetEmptySymbol();
 	int GetNumLines() const;
 	int GetNumColumns() const;
 	string	GetEmptySymbol() const;
 	void Headline() const;
-	int	GetTopLineIndexAtColumn() const;
-	int SetTopLine() const;
+	int	GetTopLineIndexAtColumn();
+	//int SetTopLine() const;
 	int SelectColumn(player player) const;
 	void putDiscAtColumn(player player); //numa determinada coluna
 	string isFull(int NumberOfPlays, int NumberOfBoardCells) const; //testar se board está cheio
 	void show() const; //mostrar board
 	string isThereAWinner() const; //símbolo do vencedor, e linha e coluna da última jogada.
-	void wouldThereBeAWinner() const; //putDisc + winner? (p/ AI) 
+	void wouldThereBeAWinner(); //putDisc + winner? (p/ AI) 
 	//(pode estar numa classe complementar - Classe Game : encarregar - se de ver conteúdo, verificar vencedor
-	void AIPlay(int selectedColumn, string AIlevel) const;
+	void AIPlay(int selectedColumn, string AIlevel);
 
+	
 };
 //--------------------------------------------------------------------------------------
 Board::Board(int numL, int numC, string emptySymbol, int winnersequencelength)
@@ -307,7 +311,7 @@ string Board::GetEmptySymbol() const
 	return this->emptySymbol;
 }
 //----------------------------------------------------------------------------------------------------
-int Board::GetTopLineIndexAtColumn() const
+int Board::GetTopLineIndexAtColumn()
 { /* Function used to find the line where the disc will be placed.
 At the start of the game, topline has numC elements equal to numL-1. Every time a disc is inserted,
 the value saved for that corresponding column decreases by 1. Hence, if we play in the same column again, we will play in a line higher by 1,
@@ -315,9 +319,9 @@ When the value is 0, it will play at the top of the column. When the value is -1
 */
 // after every play: 
 	int ColumnHeight = topline.at(LastColumnPlayed);
-	LastLinePlayed = ColumnHeight - 1;
-	topline.at(LastColumnPlayed) = LastLinePlayed;
-	return LastLinePlayed;
+	this->LastLinePlayed = ColumnHeight - 1;
+	topline.at(LastColumnPlayed) = this->LastLinePlayed;
+	return this->LastLinePlayed;
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -570,7 +574,7 @@ string Board::isThereAWinner() const
 }
 //-----------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------
-void Board::wouldThereBeAWinner() const
+void Board::wouldThereBeAWinner() 
 {
 	vector < vector <string> > test_board = board;
 
@@ -582,7 +586,7 @@ void Board::wouldThereBeAWinner() const
 	}
 }
 //-----------------------------------------------------------------------------------------------
-void Board::AIPlay(int selectedColumn, string AIlevel) const
+void Board::AIPlay(int selectedColumn, string AIlevel) 
 {
 	//wouldThereBeAWinner(); playerSymbol = "O"
 
@@ -717,7 +721,7 @@ void Game()
 	{
 		board.show(); //shows board with headline directly above and below
 		int LastColumnPlayed = board.SelectColumn(playerPlaying); //player chooses column
-		board.putDiscAtColumn(playerPlaying, LastColumnPlayed);
+		board.putDiscAtColumn(playerPlaying);
 		NumberOfPlays = NumberOfPlays + 1;
 		GameResult = board.isThereAWinner(); //tests if there is a winner
 
