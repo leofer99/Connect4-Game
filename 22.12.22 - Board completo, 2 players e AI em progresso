@@ -22,6 +22,152 @@
 using namespace std;
 
 //----------------------------------------------------------------------------------------------------
+class player
+{
+public:
+	player(int player_number, string symbol, string player_type);
+	void InputName();
+	string GetName();
+	int GetNumber();
+	string GetSymbol();
+	string GetColour();
+	string GetPlayerType();
+	void SetPlayerType(string type);
+
+private:
+	int player_number; // 1 or 2
+	string name;
+	string symbol; // 'X' or 'O'
+	string colour; // 'red' or 'blue'
+	string player_type; // "Human", "Computer_Easy", "Computer_Medium", "Computer_Hard"
+	//int N_in_line
+};
+//----------------------------------------------------------------------------------------------------
+player::player(int player_number, string symbol, string player_type)
+{
+	this->player_number = player_number;
+	this->symbol = symbol;
+	this->player_type = player_type;
+	this->name = "";
+
+	if (symbol == "X")
+		this->colour = "red";
+	else if (symbol == "O")
+		this->colour = "blue";
+}
+//----------------------------------------------------------------------------------------------------
+void player::InputName()
+{
+	if (this->player_type == "Human")
+	{
+		int ID = this->player_number;
+		cout << "\nPlayer" << ID << ", write your name: ";
+		cin >> this->name;
+		cout << "\nPlayer" << ID << ":" << this->name << endl;
+	}
+
+	else
+	{
+		this->name = this->player_type;
+		cout << "\nPlayer" << this->player_number << ":" << this->name << endl;
+	}
+
+}
+//----------------------------------------------------------------------------------------------------
+int player::GetNumber()
+{
+	return this->player_number;
+}
+//---------------------------------------------------------------------------------------
+string player::GetColour()
+{
+	return this->colour;
+}
+//---------------------------------------------------------------------------------------
+string player::GetSymbol()
+{
+	return this->symbol;
+}
+//---------------------------------------------------------------------------------------
+string player::GetName()
+{
+	return this->name;
+}
+//---------------------------------------------------------------------------------------
+string player::GetPlayerType()
+{
+	return this->player_type;
+}
+//---------------------------------------------------------------------------------------
+void player::SetPlayerType(string type)
+{
+	this->player_type = type;
+}
+//-----------------------------------------------------------------------------------------------
+player Menu(player Enemy_player)
+{
+	string GameMode = "";
+	string PlayerVSPlayer = "1";
+	string PlayerVSComputer = "2";
+	string AI_Easy = "1";
+	string AI_Medium = "2";
+	string AI_Hard = "3";
+
+	//1st Part: Choose the type of Game Mode
+	while (true)
+	{
+		cout << "How many people are playing?\n(1-Player VS Computer | 2-Player VS Player): ";
+		cin >> GameMode;
+		cout << endl;
+
+		if (GameMode == PlayerVSPlayer)
+		{
+			Enemy_player.SetPlayerType("Computer_Easy");
+			break;
+		}
+		else if (GameMode == PlayerVSComputer)
+		{
+			Enemy_player.SetPlayerType("Human");
+			break;
+		}
+		else
+			cout << "Error! You must input 1 or 2." << endl;
+	}
+
+	//2nd Part: Select Game Difficulty, in case of Player VS Computer
+	if (Enemy_player.GetPlayerType() != "Human")
+		while (true)
+		{
+			cout << "How difficult do you want the game to be?\n(1-Easy | 2-Medium | 3-Hard) ";
+			cin >> GameMode;
+
+			if (GameMode == AI_Easy)
+			{
+				Enemy_player.SetPlayerType("Computer_Easy");
+				break;
+			}
+
+			else if (GameMode == AI_Medium)
+			{
+				Enemy_player.SetPlayerType("Computer_Medium");
+				break;
+			}
+
+			else if (GameMode == AI_Hard)
+			{
+				Enemy_player.SetPlayerType("Computer_Hard");
+				break;
+			}
+
+			else
+				cout << "Error! You must input 1 , 2 or 3." << endl;
+		}
+
+	return Enemy_player;
+
+}
+
+//----------------------------------------------------------------------------------------------------
 /**
 *Class Board represents the board of the game, allowing to define the board limits, and place the disc on the column chosen with the respective player's color
 */
@@ -37,7 +183,7 @@ private:
 	string headline;
 	string winnerSequence1;
 	string winnerSequence2;
-	int NumberOfBoardCells = numC*numL;
+	int NumberOfBoardCells = numC * numL;
 
 	//Guardar linha e coluna da última jogada(procurar se há vencedor, apartir dessa posição)
 	int LastLinePlayed, LastColumnPlayed;
@@ -49,9 +195,6 @@ private:
 public:
 	Board(int numL, int numC, string emptySymbol, int winnersequencelength);
 	void SetEmptySymbol();
-	//void SetNumLines();
-	//void SetNumColumns();
-	//void SetConditionsForWinner();
 	int GetNumLines() const;
 	int GetNumColumns() const;
 	string	GetEmptySymbol() const;
@@ -59,7 +202,7 @@ public:
 	int	GetTopLineIndexAtColumn() const;
 	int SetTopLine() const;
 	int SelectColumn(player player) const;
-	void putDiscAtColumn(player player, int LastPlayedColumn); //numa determinada coluna
+	void putDiscAtColumn(player player); //numa determinada coluna
 	string isFull(int NumberOfPlays, int NumberOfBoardCells) const; //testar se board está cheio
 	void show() const; //mostrar board
 	string isThereAWinner() const; //símbolo do vencedor, e linha e coluna da última jogada.
@@ -78,7 +221,7 @@ Board::Board(int numL, int numC, string emptySymbol, int winnersequencelength)
 	string winnerSequence2(numN, 'O');
 	this->winnerSequence1 = winnerSequence1;
 	this->winnerSequence2 = winnerSequence2;
-	this->topline= vector<int>(numC, numL - 1);
+	this->topline = vector<int>(numC, numL - 1);
 	this->board = vector <vector<string>>(numL, vector<string>(numC, emptySymbol));
 }
 //--------------------------------------------------------------------------------------
@@ -206,7 +349,7 @@ int Board::SelectColumn(player player) const
 
 			if (PossibleColumnSelected == Not_found) // garante que o inputed_column averiguado encontra-se na headline
 				cout << "\nError! You must insert a valid input." << endl;
-			
+
 			else //if the value is valid
 			{
 				int ColumnHeight = topline.at(PossibleColumnSelected);
@@ -222,16 +365,16 @@ int Board::SelectColumn(player player) const
 		PossibleColumnSelected = AI_selectedColumn;
 
 	int LastColumnPlayed = PossibleColumnSelected;
-	
+
 	return LastColumnPlayed;
 }
 //-----------------------------------------------------------------------------------------------
-void Board::putDiscAtColumn(class player player)
+void Board::putDiscAtColumn(player player)
 {	//works for both AI and Player
 
-	this->LastColumnPlayed= LastColumnPlayed;
-	this->LastLinePlayed= GetTopLineIndexAtColumn();
-	this->LastDiscSymbol= player.GetSymbol();
+	this->LastColumnPlayed = LastColumnPlayed;
+	this->LastLinePlayed = GetTopLineIndexAtColumn();
+	this->LastDiscSymbol = player.GetSymbol();
 	board.at(LastLinePlayed).at(LastColumnPlayed) = LastDiscSymbol;
 }
 //-----------------------------------------------------------------------------------------------
@@ -386,7 +529,8 @@ string Board::isThereAWinner() const
 			for (int i = 0; i < HighestDimension; i++)
 			{
 				if ((lin + i < numL) && (col - i >= 0))
-				{	NegativeDiagonalWin = NegativeDiagonalWin + board.at(lin + i).at(col - i);
+				{
+					NegativeDiagonalWin = NegativeDiagonalWin + board.at(lin + i).at(col - i);
 				}
 				else
 					break;
@@ -405,18 +549,21 @@ string Board::isThereAWinner() const
 	string winner = "";
 
 	if (possibleNegativeDiagonalWins < 0 || possiblePositiveDiagonalWins < 0 || possibleVerticalWins < 0 || possibleHorizontalWins < 0)
-	{	winner = "Player2";
+	{
+		winner = "Player2";
 		return winner;
 	}
 
 
 	else if (possibleNegativeDiagonalWins > 0 || possiblePositiveDiagonalWins > 0 || possibleVerticalWins > 0 || possibleHorizontalWins > 0)
-	{	winner = "Player1";
+	{
+		winner = "Player1";
 		return winner;
 	}
 
 	else
-	{	winner = "";
+	{
+		winner = "";
 		return winner;
 	}
 
@@ -435,195 +582,64 @@ void Board::wouldThereBeAWinner() const
 	}
 }
 //-----------------------------------------------------------------------------------------------
-	void Board::AIPlay(int selectedColumn, string AIlevel) const
+void Board::AIPlay(int selectedColumn, string AIlevel) const
+{
+	//wouldThereBeAWinner(); playerSymbol = "O"
+
+	vector < vector <string> > test_board = board;
+	int HighestDimension = max(numC, numL);
+	double counting_points = 0;
+	double counting_symbols = 0;
+	string winner = ""; // "Player1", "Player2" or "".
+	int NotFoundInStr = string::npos;
+
+	string ComputerSymbol = "O";
+	string HumanSymbol = "X";
+	string emptySymbolStr = "";
+	bool change = false;
+
+
+	// AI Easy - Places pieces randomly.
+	if (AIlevel == "Computer_Easy")
 	{
-		//wouldThereBeAWinner(); playerSymbol = "O"
+		// AI_move = min + (rand() % (int)(max - min + 1)) / min=0 e max=numC
+		int AI_move = rand() % (int)(numC + 1); //random number between 0 and numC
 
-		vector < vector <string> > test_board = board;
-		
-		// AI Easy - Places pieces randomly.
-		if (AIlevel == "Computer_Easy")
-		{
-			// AI_move = min + (rand() % (int)(max - min + 1)) / min=0 e max=numC
-			int AI_move = rand() % (int)(numC + 1); //random number between 0 and numC
-
-			test_board.at(topline.at(AI_move)).at(AI_move) = "O";
-			//string symbol= "O";
-			board.at(topline.at(AI_move)).at(AI_move) = "O";
-			board = test_board; // erro?
-		}
-
-		// AI Medium - Plays most of the time randomly, except when the AI can get a win or stop the opponent for winning. 
-		else if (AIlevel == "Computer_Medium")
-		{
-			// Insert a piece in every column of the test_board, a copy of the original board.
-			for (int i = 0; i < numC; i++)
-			{	test_board.at(topline.at(i)).at(i) = "O";
-				string winner = test_board.isThereAWinner();
-				test_board.at(topline.at(i)).at(i) = emptySymbol;
-
-				if (winner == "Player2")
-					board.at(topline.at(i)).at(i) = "O"; break; // erro?
-
-				test_board.at(topline.at(i)).at(i) = "X";
-				string winner = test_board.isThereAWinner();
-				test_board.at(topline.at(i)).at(i) = emptySymbol;
-
-				if (winner == "Player1")
-					board.at(topline.at(i)).at(i) = "O"; break; // erro?
-			}
-		}
-
-}
-//-----------------------------------------------------------------------------------------------
-//-----------------------------------------------------------------------------------------------
-class player
-{
-public:
-	player(int player_number, string symbol, string player_type);
-	void InputName();
-	string GetName();
-	int GetNumber();
-	string GetSymbol();
-	string GetColour();
-	string GetPlayerType();
-	void SetPlayerType(string type);
-
-private:
-	int player_number; // 1 or 2
-	string name;
-	string symbol; // 'X' or 'O'
-	string colour; // 'red' or 'blue'
-	string player_type; // "Human", "Computer_Easy", "Computer_Medium", "Computer_Hard"
-	//int N_in_line
-};
-//----------------------------------------------------------------------------------------------------
-player::player(int player_num, string symbol, string player_type)
-{
-	this->player_number = player_num;
-	this->symbol = symbol;
-	this->player_type = player_type;
-	this->name = "";
-
-	if (symbol == "X")
-		this->colour = "red";
-	else if (symbol == "O")
-		this->colour = "blue";
-}
-//----------------------------------------------------------------------------------------------------
-void player::InputName()
-{
-	if (this->player_type == "Human")
-	{
-		int ID = this->player_number;
-		cout << "\nPlayer" << ID << ", write your name: ";
-		cin >> this->name;
-		cout << "\nPlayer" << ID << ":" << this->name << endl;
+		test_board.at(topline.at(AI_move)).at(AI_move) = "O";
+		//string symbol= "O";
+		board.at(topline.at(AI_move)).at(AI_move) = "O";
+		board = test_board; // erro?
 	}
 
-	else
+	// AI Medium - Plays most of the time randomly, except when the AI can get a win or stop the opponent for winning. 
+	else if (AIlevel == "Computer_Medium")
 	{
-		this->name = this->player_type;
-		cout << "\nPlayer" << this->player_number << ":" << this->name << endl;
+		// Insert a piece in every column of the test_board, a copy of the original board.
+		for (int i = 0; i < numC; i++)
+		{
+			test_board.at(topline.at(i)).at(i) = "O";
+			string winner = test_board.isThereAWinner();
+			test_board.at(topline.at(i)).at(i) = emptySymbol;
+
+			if (winner == "Player2")
+				board.at(topline.at(i)).at(i) = "O"; break; // erro?
+
+			test_board.at(topline.at(i)).at(i) = "X";
+			string winner = test_board.isThereAWinner();
+			test_board.at(topline.at(i)).at(i) = emptySymbol;
+
+			if (winner == "Player1")
+				board.at(topline.at(i)).at(i) = "O"; break; // erro?
+		}
 	}
 
 }
-//----------------------------------------------------------------------------------------------------
-int player::GetNumber()
-{
-	return this->player_number;
-}
-//---------------------------------------------------------------------------------------
-string player::GetColour()
-{
-	return this->colour;
-}
-//---------------------------------------------------------------------------------------
-string player::GetSymbol()
-{
-	return this->symbol;
-}
-//---------------------------------------------------------------------------------------
-string player::GetName()
-{
-	return this->name;
-}
-//---------------------------------------------------------------------------------------
-string player::GetPlayerType()
-{
-	return this->player_type;
-}
-//---------------------------------------------------------------------------------------
-void player::SetPlayerType(string type)
-{
-	this->player_type = type;
-}
-//-----------------------------------------------------------------------------------------------
-player Menu(player Enemy_player)
-{
-	string GameMode = "";
-	string PlayerVSPlayer = "1";
-	string PlayerVSComputer = "2";
-	string AI_Easy = "1";
-	string AI_Medium = "2";
-	string AI_Hard = "3";
-
-	//1st Part: Choose the type of Game Mode
-	while (true)
-	{
-		cout << "How many people are playing?\n(1-Player VS Computer | 2-Player VS Player): ";
-		cin >> GameMode;
-		cout << endl;
-
-		if (GameMode == PlayerVSPlayer)
-		{
-			Enemy_player.SetPlayerType("Computer_Easy");
-			break;
-		}
-		else if (GameMode == PlayerVSComputer)
-		{
-			Enemy_player.SetPlayerType("Human");
-			break;
-		}
-		else
-			cout << "Error! You must input 1 or 2." << endl;
-	}
-
-	//2nd Part: Select Game Difficulty, in case of Player VS Computer
-	if (Enemy_player.GetPlayerType() != "Human")
-		while (true)
-		{
-			cout << "How difficult do you want the game to be?\n(1-Easy | 2-Medium | 3-Hard) ";
-			cin >> GameMode;
-
-			if (GameMode == AI_Easy)
-			{
-				Enemy_player.SetPlayerType("Computer_Easy");
-				break;
-			}
-
-			else if (GameMode == AI_Medium)
-			{
-				Enemy_player.SetPlayerType("Computer_Medium");
-				break;
-			}
-
-			else if (GameMode == AI_Hard)
-			{
-				Enemy_player.SetPlayerType("Computer_Hard");
-				break;
-			}
-
-			else
-				cout << "Error! You must input 1 , 2 or 3." << endl;
-		}
-
-	return Enemy_player;
-
-}
 //-----------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------
-/*End of Class player. 
+
+//-----------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------
+/*End of Class player.
 Start of Functions to help play the game*/
 //-----------------------------------------------------------------------------------------------
 int SetNumLines()
@@ -698,14 +714,16 @@ void Game()
 
 	//Game Start
 	while (true)
-	{	board.show(); //shows board with headline directly above and below
-		int LastColumnPlayed= board.SelectColumn(playerPlaying); //player chooses column
+	{
+		board.show(); //shows board with headline directly above and below
+		int LastColumnPlayed = board.SelectColumn(playerPlaying); //player chooses column
 		board.putDiscAtColumn(playerPlaying, LastColumnPlayed);
 		NumberOfPlays = NumberOfPlays + 1;
-		GameResult= board.isThereAWinner(); //tests if there is a winner
-		
+		GameResult = board.isThereAWinner(); //tests if there is a winner
+
 		if (GameResult == "IsWinner")
-		{	GameEnd(player1, player2, winnerInfo); //game ends
+		{
+			GameEnd(player1, player2, winnerInfo); //game ends
 			break;
 		}
 
@@ -723,35 +741,36 @@ void Game()
 			else //if there is no tie, game keeps going: players switch turns
 			{
 				if (strPlayerPlaying == "player1")
-				//if (playerPlaying.GetNumber() == 1)
+					//if (playerPlaying.GetNumber() == 1)
 				{
 					player1 = playerPlaying; //saves last play
 					playerPlaying = player2; //switches player
 					//strPlayerPlaying = "player2";
 					break;
 				}
-				else if (strPlayerPlaying=="player2")
-				//else if (playerPlaying.GetNumber() == 2)
+				else if (strPlayerPlaying == "player2")
+					//else if (playerPlaying.GetNumber() == 2)
 				{
 					player2 = playerPlaying; //saves last play
 					playerPlaying = player1; //switches player
 					strPlayerPlaying = "player1";
 					break;
-				}	
+				}
 			}
 		}
 	}
 }
 //-----------------------------------------------------------------------------------------------
 char time()
-{	time_t t;
+{
+	time_t t;
 	struct tm* infoTime;
 	char DayTime[20]; //Where the time information will be saved.
 
 	time(&t);
 	infoTime = localtime(&t); //Get the time 
 
-	strftime(DayTime, 20, "%F / %R" , infoTime); //Creates the Day and Time with the following format YYYY/MM/DD / HH:MM
+	strftime(DayTime, 20, "%F / %R", infoTime); //Creates the Day and Time with the following format YYYY/MM/DD / HH:MM
 
 	return DayTime[20];
 }
@@ -763,7 +782,7 @@ void GameEnd(player player1, player player2, string winnerInfo)
 	{
 		//if CTRL-Z is activated, nothing is registered in the file.
 		//if it is not activated/pressed, data is registered in the file
-	
+
 		ofstream file;
 		file.open("winner.txt");// Creates the file 
 
@@ -793,7 +812,7 @@ void GameEnd(player player1, player player2, string winnerInfo)
 //-----------------------------------------------------------------------------------------------
 int main()
 {
-	srand(unsigned(time(NULL))); 
+	srand(unsigned(time(NULL)));
 	Game();
 	return 0;
 }
