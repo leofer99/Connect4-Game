@@ -229,7 +229,7 @@ Board::Board(int numL, int numC, string emptySymbol, int winnersequencelength)
 	string winnerSequence2(numN, 'O');
 	this->winnerSequence1 = winnerSequence1;
 	this->winnerSequence2 = winnerSequence2;
-	this->topline = vector<int>(numC, numL - 1);
+	this->topline = vector<int>(numC, numL);
 	this->board = vector <vector<string>>(numL, vector<string>(numC, emptySymbol));
 }
 //--------------------------------------------------------------------------------------
@@ -281,6 +281,7 @@ When the value is 0, it will play at the top of the column. When the value is -1
 // after every play: 
 	int ColumnHeight = topline.at(LastColumnPlayed);
 	this->LastLinePlayed = ColumnHeight - 1;
+	cout << "LastLine Played (dentro TopLine):" << LastLinePlayed;
 	topline.at(LastColumnPlayed) = this->LastLinePlayed;
 	return this->LastLinePlayed;
 }
@@ -345,10 +346,13 @@ void Board::putDiscAtColumn(player player)
 
 	this->LastColumnPlayed = LastColumnPlayed;
 	this->LastLinePlayed = GetTopLineIndexAtColumn();
+	cout << "LastCol Played:" << LastColumnPlayed;
+	cout << "LastLine Played:" << LastLinePlayed;
+
 	this->LastDiscSymbol = player.GetSymbol();
-	board.at(LastColumnPlayed).at(LastLinePlayed) = LastDiscSymbol;
+	board.at(LastLinePlayed).at(LastColumnPlayed) = LastDiscSymbol;
 	
-	//cout << "Has put the disc";
+	cout << "Has put the disc";
 }
 //-----------------------------------------------------------------------------------------------
 string Board::isFull(int NumberOfPlays, int NumberOfBoardCells) const
