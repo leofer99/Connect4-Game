@@ -1,0 +1,25 @@
+//-----------------------------------------------------------------------------------------------
+int SetConditionsForWinner(int numL, int numC)
+{
+	int numN = 0;
+	string numNStr = "";
+
+	while (numN < 4 || numN> max(numC, numL))
+	{
+		cout << "Please, choose how many consecutive symbols are needed to win (Minimun = 4):  ";
+		cin >> numNStr;
+
+		bool isInt = (numNStr.find_first_not_of("0123456789") == std::string::npos);
+
+
+		if (isInt==true)
+			numN = stoi(numNStr);
+
+		if (numN < 4 || numN> max(numC, numL))
+		{
+			cout << "Invalid Condition!! \n";
+		}
+	}
+	return numN;
+}
+//-----------------------------------------------------------------------------------------------
