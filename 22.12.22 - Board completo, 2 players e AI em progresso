@@ -226,7 +226,7 @@ int Board::SelectColumn(player player) const
 	return LastColumnPlayed;
 }
 //-----------------------------------------------------------------------------------------------
-void Board::putDiscAtColumn(player player)
+void Board::putDiscAtColumn(class player player)
 {	//works for both AI and Player
 
 	this->LastColumnPlayed= LastColumnPlayed;
@@ -420,7 +420,6 @@ string Board::isThereAWinner() const
 		return winner;
 	}
 
-
 }
 //-----------------------------------------------------------------------------------------------
 //-----------------------------------------------------------------------------------------------
@@ -441,6 +440,7 @@ void Board::wouldThereBeAWinner() const
 		//wouldThereBeAWinner(); playerSymbol = "O"
 
 		vector < vector <string> > test_board = board;
+		
 		// AI Easy - Places pieces randomly.
 		if (AIlevel == "Computer_Easy")
 		{
@@ -448,16 +448,15 @@ void Board::wouldThereBeAWinner() const
 			int AI_move = rand() % (int)(numC + 1); //random number between 0 and numC
 
 			test_board.at(topline.at(AI_move)).at(AI_move) = "O";
+			//string symbol= "O";
+			board.at(topline.at(AI_move)).at(AI_move) = "O";
 			board = test_board; // erro?
 		}
-
 
 		// AI Medium - Plays most of the time randomly, except when the AI can get a win or stop the opponent for winning. 
 		else if (AIlevel == "Computer_Medium")
 		{
-
 			// Insert a piece in every column of the test_board, a copy of the original board.
-
 			for (int i = 0; i < numC; i++)
 			{	test_board.at(topline.at(i)).at(i) = "O";
 				string winner = test_board.isThereAWinner();
