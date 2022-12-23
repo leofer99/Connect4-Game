@@ -436,13 +436,19 @@ string Board::isThereAWinner()
 		if (linWin.find(winnerSequence1) == NotFoundInStr && linWin.find(winnerSequence2) == NotFoundInStr) //when player2 hasn't won and when player1 hasn't won
 			possibleHorizontalWins = 0;
 		else if (linWin.find(winnerSequence1) != NotFoundInStr) //player1 has won
+		{
 			possibleHorizontalWins = 1;
+			break;
+		}
 		else if (linWin.find(winnerSequence2) != NotFoundInStr) //player2 has won
+		{
 			possibleHorizontalWins = -1;
+			break;
+		}
  
 		linWin = ""; //cleaning after each iteration
 	}
-	cout <<"Horizontal win if 1: " << possibleHorizontalWins << endl;;
+	//cout <<"Horizontal win: " << possibleHorizontalWins << endl;;
 	//cout << "linWin: " << possibleHorizontalWins;
 
 	// Iterator for the 2-D vector
@@ -467,13 +473,19 @@ string Board::isThereAWinner()
 		if (ColWin.find(winnerSequence1) == NotFoundInStr && ColWin.find(winnerSequence2) == NotFoundInStr ) //when player2 hasn't won and when player1 hasn't won
 			possibleVerticalWins = 0;
 		else if (ColWin.find(winnerSequence1) != NotFoundInStr) //player1 has won
+		{
 			possibleVerticalWins = 1;
+			break;
+		}
 		else if (ColWin.find(winnerSequence2) != NotFoundInStr) //player2 has won
+		{
 			possibleVerticalWins = -1;
+			break;
+		}
 
+		cout << "Vertical win: " << possibleVerticalWins << endl;
 		ColWin = ""; //cleaning
 	}
-	cout << "Vertical win if 1: " << possibleVerticalWins;
 
 	//PositiveDiagonalWin PossiblePositiveDiagonalWin
 	// Vitória diagonalLeftToRight (/)
@@ -484,22 +496,39 @@ string Board::isThereAWinner()
 		{
 			for (int i = 0; i < HighestDimension; i++)
 			{
-				if ((lin + i < numL) && (col + i < numC))
+				if ((lin + i < numL) && (col- i < numC))
 					PositiveDiagonalWin = PositiveDiagonalWin + board.at(lin + i).at(col + i);
 				else
+					if (PositiveDiagonalWin.find(winnerSequence1) == NotFoundInStr && PositiveDiagonalWin.find(winnerSequence2) == NotFoundInStr) //when player2 hasn't won and when player1 hasn't won
+						possiblePositiveDiagonalWins = 0;
+					else if (PositiveDiagonalWin.find(winnerSequence1) != NotFoundInStr) //player1 has won
+					{
+						possiblePositiveDiagonalWins = 1;
+						break; break; break;
+					}
+					else if (PositiveDiagonalWin.find(winnerSequence2) != NotFoundInStr) //player2 has won
+					{
+						possiblePositiveDiagonalWins = -1;
+						break; break; break;
+					}
+
 					break;
 			}
-
-			if (PositiveDiagonalWin.find(winnerSequence1) == NotFoundInStr && PositiveDiagonalWin.find(winnerSequence2) == NotFoundInStr) //when player2 hasn't won and when player1 hasn't won
-				possiblePositiveDiagonalWins = 0;
-			else if (PositiveDiagonalWin.find(winnerSequence1) != NotFoundInStr) //player1 has won
-				possiblePositiveDiagonalWins = 1;
-			else if (PositiveDiagonalWin.find(winnerSequence2) != NotFoundInStr) //player2 has won
-				possiblePositiveDiagonalWins = -1;
-
-			PositiveDiagonalWin = "";
 		}
-		//cout << "linWin: " << linWin << endl;
+
+		cout << "PositiveDiag : " << PositiveDiagonalWin << endl;
+
+		if (PositiveDiagonalWin.find(winnerSequence1) == NotFoundInStr && PositiveDiagonalWin.find(winnerSequence2) == NotFoundInStr) //when player2 hasn't won and when player1 hasn't won
+			possiblePositiveDiagonalWins = 0;
+		else if (PositiveDiagonalWin.find(winnerSequence1) != NotFoundInStr) //player1 has won
+		{	possiblePositiveDiagonalWins = 1;
+			break;
+		}
+		else if (PositiveDiagonalWin.find(winnerSequence2) != NotFoundInStr) //player2 has won
+		{	possiblePositiveDiagonalWins = -1;
+			break;
+		}
+		PositiveDiagonalWin = "";
 	}
 
 	cout << "Positive diag win if 1: " << possiblePositiveDiagonalWins;
@@ -513,22 +542,23 @@ string Board::isThereAWinner()
 		{
 			for (int i = 0; i < HighestDimension; i++)
 			{
-				if ((lin + i < numL) && (col - i >= 0))
+				if ((lin + i < numL) && (col + i >= 0))
 				{
-					NegativeDiagonalWin = NegativeDiagonalWin + board.at(lin + i).at(col - i);
+					NegativeDiagonalWin = NegativeDiagonalWin + board.at(lin + i).at(col + i);
 				}
 				else
-					break;
-			}
+					if (NegativeDiagonalWin.find(winnerSequence1) == NotFoundInStr && NegativeDiagonalWin.find(winnerSequence2) == NotFoundInStr) //when player2 hasn't won and when player1 hasn't won
+						possibleNegativeDiagonalWins = 0;
+					else if (NegativeDiagonalWin.find(winnerSequence1) != NotFoundInStr) //player1 has won
+						possibleNegativeDiagonalWins = 1;
+					else if (NegativeDiagonalWin.find(winnerSequence2) != NotFoundInStr) //player2 has won
+						possibleNegativeDiagonalWins = -1;
 
-			if (NegativeDiagonalWin.find(winnerSequence1) == NotFoundInStr && NegativeDiagonalWin.find(winnerSequence2) == NotFoundInStr) //when player2 hasn't won and when player1 hasn't won
-				possibleNegativeDiagonalWins = 0;
-			else if (NegativeDiagonalWin.find(winnerSequence1) != NotFoundInStr) //player1 has won
-				possibleNegativeDiagonalWins = 1;
-			else if (NegativeDiagonalWin.find(winnerSequence2) != NotFoundInStr) //player2 has won
-				possibleNegativeDiagonalWins = -1;
-
-			NegativeDiagonalWin = "";
+					NegativeDiagonalWin = "";
+					cout << "NegDiag: " << NegativeDiagonalWin << endl;
+					cout << "NegDiag win: " << possiblePositiveDiagonalWins << endl;
+					break;	
+			}		
 		}
 	}
 	cout << "Neg diag win if 1: " << possibleNegativeDiagonalWins;
